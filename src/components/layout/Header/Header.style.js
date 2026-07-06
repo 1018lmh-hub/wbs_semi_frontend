@@ -58,6 +58,7 @@ export const AuthContainer = styled.div`
 `;
 
 export const AuthItem = styled.div`
+  margin-top: 7px;
   color: ${theme.color.sub};
   font-family: "Noto Sans KR", sans-serif;
   font-size: ${theme.fontSize.sm};

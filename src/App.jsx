@@ -5,7 +5,11 @@ import { Routes, Route } from "react-router-dom";
 
 // Layout & Global Components
 import MainLayout from "./components/layout/MainLayout/MainLayout";
-import Map from "./features/map/Map"; // 테스트 중이므로 Map 컴포넌트 import 유지 (현재 MainLayout 내부에서 직접 렌더링 중)
+import StationDetail from "./features/station/StationDetail";
+import ReviewForm from "./features/review/ReviewForm";
+import SignUp from "./features/user/SignUp";
+import Login from "./features/user/Login";
+import ReviewList from "./features/review/ReviewList";
 
 // 화면 레이아웃 및 중첩 라우팅 테스트를 위한 임시(Dummy) 컴포넌트
 const DummyPage = ({ title }) => (
@@ -27,13 +31,22 @@ function App() {
     <Routes>
       {/* 부모 라우트: Header와 Map을 포함하는 전역 레이아웃 */}
       <Route element={<MainLayout />}>
-        {/* 기본 경로 (/): 사이드바 컨텐츠 없이 지도만 노출 */}
+        {/* 기본 경로 (/): 오버레이 컨텐츠 없이 지도만 노출 */}
         <Route index element={null} />
 
-        {/* 임시 라우트 연결 (URL 변경 시 사이드바 영역에 표출) */}
-        <Route path="login" element={<DummyPage title="로그인" />} />
-        <Route path="signup" element={<DummyPage title="회원가입" />} />
+        {/* 임시 라우트 연결 (URL 변경 시 오버레이 영역에 표출) */}
+        <Route path="login" element={<Login />} />
+        <Route path="signup" element={<SignUp />} />
         <Route path="boards" element={<DummyPage title="게시판 목록" />} />
+
+        {/* 신규 추가: 지도 마커 클릭 시 이동하는 충전소 상세 라우트 */}
+        <Route path="stations/:stationId" element={<StationDetail />} />
+        {/* 신규 추가: StationDetail/후기 전체보기의 "후기 작성" 버튼에서 이동 */}
+        <Route
+          path="stations/:stationId/reviews/form"
+          element={<ReviewForm />}
+        />
+        <Route path="stations/:stationId/reviews" element={<ReviewList />} />
 
         {/* 404 라우트 */}
         <Route

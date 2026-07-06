@@ -67,7 +67,7 @@ function createMarkers(
         size: new window.naver.maps.Size(88, 88),
         scaledSize: new window.naver.maps.Size(88, 88),
         origin: new window.naver.maps.Point(0, 0),
-        anchor: new window.naver.maps.Point(24, 24),
+        anchor: new window.naver.maps.Point(44, 10),
       },
     });
 
@@ -130,8 +130,12 @@ function initCluster(mapInstance, markers) {
 // ─────────────────────────────────────────────
 // Map 컴포넌트
 // ─────────────────────────────────────────────
-// onStationSelect: 마커(충전소) 클릭 시 호출되는 콜백. 추후 사이드바 오픈 등에 사용.
-const Map = ({ onStationSelect }) => {
+// onStationSelect: 마커(충전소) 클릭 시 호출되는 콜백. 사이드바 오픈(라우팅)에 사용.
+// onLocationsLoaded: 충전소 목록 fetch가 끝날 때마다 호출되는 콜백.
+//   StationDetail이 stationId로 단건을 찾아 써야 하는데 전용 단건 조회 API가 없어서,
+//   이 목록을 상위(MainLayout)로 끌어올려 Outlet context로 공유하기 위해 추가함.
+//   (Map 내부 로직/렌더링에는 영향 없음 — 상위에 알려주는 용도로만 추가)
+const Map = ({ onStationSelect, onLocationsLoaded }) => {
   const mapRef = useRef(null);
   const mapInstanceRef = useRef(null);
   const markersRef = useRef([]);
@@ -215,6 +219,8 @@ const Map = ({ onStationSelect }) => {
       .then((stations) => {
         if (cancelled) return;
         setLocations(stations);
+        // 상위(MainLayout)에도 동일 목록을 전달 — StationDetail에서 stationId로 조회할 때 사용
+        onLocationsLoaded?.(stations);
       })
       .catch((err) => {
         if (cancelled) return;
@@ -228,7 +234,7 @@ const Map = ({ onStationSelect }) => {
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   // ── (C) 마커 & 클러스터 렌더링 Effect (locations 변경 시 재실행)
   useEffect(() => {
