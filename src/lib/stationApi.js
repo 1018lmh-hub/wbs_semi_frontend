@@ -83,3 +83,39 @@ export async function fetchChargingStations(endpoint = "/charging-stations") {
   const rows = parseStationResponse(responseBody);
   return groupRowsByStation(rows);
 }
+
+export const fetchStationReviews = async (stationNo) => {
+  try {
+    const res = await api.get(`/stations/${stationNo}`);
+    return res.data.data;
+  } catch (err) {
+    if (err.response?.data?.code === 400) {
+      return { reviews: [], avgRating: 0, bookmark: null };
+    }
+    throw err;
+  }
+};
+
+export const createStationReview = async (
+  stationNo,
+  { title, content, rating },
+) => {
+  const res = await api.post(`/stations/${stationNo}/reviews`, {
+    reviewTitle: title,
+    reviewContent: content,
+    rating,
+  });
+  return res.data;
+};
+
+export const fetchStationReviewList = async (stationNo, page = 1) => {
+  try {
+    const res = await api.get(`/stations/${stationNo}/reviews`, {
+      params: { page },
+    });
+    return res.data.data; // { reviews, avgRating, bookmark, pageInfo }
+  } catch (err) {
+    // 존재하지 않는 페이지 요청 등은 컴포넌트에서 처리하도록 그대로 던짐
+    throw err;
+  }
+};
