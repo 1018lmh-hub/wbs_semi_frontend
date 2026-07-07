@@ -3,13 +3,11 @@ import React, { createContext, useCallback, useContext, useState } from "react";
 
 const AuthContext = createContext(null);
 
-// PROJECT_CONTEXT의 localStorage 키 컨벤션에서 memberId를 userId로 통일
-// (review.userId와 동일한 키 이름으로 맞춰 본인 글 판별 시 혼동 방지)
 const STORAGE_KEYS = {
   token: "token",
   refreshToken: "refreshToken",
   userId: "userId",
-  memberName: "memberName",
+  nickname: "nickname", // memberName → nickname으로 통일 (review.nickname 등과 이름 맞춤)
   role: "role",
 };
 
@@ -19,7 +17,7 @@ const getStoredUser = () => {
 
   return {
     userId: localStorage.getItem(STORAGE_KEYS.userId),
-    memberName: localStorage.getItem(STORAGE_KEYS.memberName),
+    nickname: localStorage.getItem(STORAGE_KEYS.nickname),
     role: localStorage.getItem(STORAGE_KEYS.role),
   };
 };
@@ -27,18 +25,17 @@ const getStoredUser = () => {
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(getStoredUser);
 
-  // Login.jsx에서 POST /auth/login 성공 시 응답의 data 필드를 그대로 전달해서 호출
   // data: { userId, nickname, accessToken, refreshToken, role }
   const login = useCallback((data) => {
     localStorage.setItem(STORAGE_KEYS.token, data.accessToken);
     localStorage.setItem(STORAGE_KEYS.refreshToken, data.refreshToken);
     localStorage.setItem(STORAGE_KEYS.userId, data.userId);
-    localStorage.setItem(STORAGE_KEYS.memberName, data.nickname);
+    localStorage.setItem(STORAGE_KEYS.nickname, data.nickname);
     localStorage.setItem(STORAGE_KEYS.role, data.role);
 
     setUser({
       userId: data.userId,
-      memberName: data.nickname,
+      nickname: data.nickname,
       role: data.role,
     });
   }, []);
@@ -48,11 +45,18 @@ export const AuthProvider = ({ children }) => {
     setUser(null);
   }, []);
 
+  // 마이페이지 닉네임 수정 성공 시 호출: localStorage + 전역 상태 동시 갱신
+  const updateNickname = useCallback((newNickname) => {
+    localStorage.setItem(STORAGE_KEYS.nickname, newNickname);
+    setUser((prev) => (prev ? { ...prev, nickname: newNickname } : prev));
+  }, []);
+
   const value = {
-    user, // { userId, memberName, role } | null
+    user, // { userId, nickname, role } | null
     isLoggedIn: !!user,
     login,
     logout,
+    updateNickname,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

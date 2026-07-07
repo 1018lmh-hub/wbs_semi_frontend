@@ -39,10 +39,11 @@ const BoardHome = () => {
       <Title>게시판</Title>
 
       <ButtonGroup>
+        // BoardHome.jsx 내 handleClick 부분만 변경
         <BoardButton type="button" onClick={() => navigate("/notices")}>
           공지사항
         </BoardButton>
-        <BoardButton type="button" onClick={() => navigate("/inquiries")}>
+        <BoardButton type="button" onClick={() => navigate("/inquirys")}>
           문의게시판
         </BoardButton>
       </ButtonGroup>
