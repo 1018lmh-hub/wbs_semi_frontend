@@ -58,3 +58,20 @@ export const ToastCloseButton = styled.button`
     opacity: 1;
   }
 `;
+
+export const ToastActionButton = styled.button`
+  flex-shrink: 0;
+  background: none;
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  border-radius: 4px;
+  padding: 2px ${theme.space.xs};
+  color: #fff;
+  font-size: ${theme.fontSize.xs};
+  font-weight: bold;
+  cursor: pointer;
+  white-space: nowrap;
+
+  &:hover {
+    background-color: rgba(255, 255, 255, 0.15);
+  }
+`;

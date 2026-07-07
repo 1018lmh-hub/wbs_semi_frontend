@@ -1,5 +1,7 @@
 // src/features/review/ReviewItem.jsx
 import React from "react";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "../../context/AuthContext";
 import {
   ItemContainer,
   TopRow,
@@ -11,9 +13,11 @@ import {
   LikeCount,
   DateText,
   ContentText,
+  BottomRow,
+  EditButton,
+  DeleteButton,
 } from "./ReviewItem.style";
 
-// TODO: 프로필 이미지 fallback을 쓰는 곳이 더 늘어나면 lib/ 유틸로 한 번 더 추출 검토
 const DEFAULT_PROFILE_IMAGE =
   "data:image/svg+xml;utf8," +
   encodeURIComponent(
@@ -24,22 +28,34 @@ const DEFAULT_PROFILE_IMAGE =
       `</svg>`,
   );
 
-// "2026-07-03T14:54:36.757" -> "2026-07-03"
 const formatDate = (isoString) => (isoString ? isoString.slice(0, 10) : "");
 
 /**
- * 후기 1건을 렌더링하는 공통 아이템 (카드형).
- * ReviewPreview(StationDetail 하단 미리보기)와 ReviewList(후기 전체보기)에서 공유.
- *
- * @param {object} review - 후기 데이터
- * @param {"preview"|"list"} variant - "preview": 제목 한 줄 말줄임 + 내용 2줄 말줄임 (StationDetail 미리보기용)
- *                                      "list": 제목/내용 모두 전체 표시 (후기 전체보기용)
- *
- * 레이아웃 우선순위: 제목 > 내용 > 작성자(닉네임)
- * - 좋아요/작성일은 우측 상단에 보조 정보로만 작게 표시
- * - changeProfileName이 없으면(null) 기본 프로필 이미지로 대체
+ * @param {Function} [onDeleteClick] - 삭제 버튼 클릭 시 호출 (review 전달).
+ *   부모(ReviewList/ReviewPreview)가 useReviewDeletion의 requestDelete를 연결해서 넘겨줌.
+ *   전달하지 않으면 삭제 버튼 자체가 렌더링되지 않음.
  */
-const ReviewItem = ({ review, variant = "list" }) => {
+const ReviewItem = ({ review, variant = "list", onDeleteClick }) => {
+  const navigate = useNavigate();
+  const { user } = useAuth();
+
+  const isOwner = !!user && user.userId === review.userId;
+
+  const handleEditClick = () => {
+    navigate(`/stations/${review.stationNo}/reviews/${review.reviewNo}/edit`, {
+      state: {
+        reviewNo: review.reviewNo,
+        reviewTitle: review.reviewTitle,
+        reviewContent: review.reviewContent,
+        rating: review.rating,
+      },
+    });
+  };
+
+  const handleDeleteClick = () => {
+    onDeleteClick?.(review);
+  };
+
   return (
     <ItemContainer>
       <TopRow>
@@ -61,6 +77,17 @@ const ReviewItem = ({ review, variant = "list" }) => {
         </Meta>
       </TopRow>
       <ContentText $variant={variant}>{review.reviewContent}</ContentText>
+
+      {isOwner && (
+        <BottomRow>
+          <EditButton type="button" onClick={handleEditClick}>
+            수정
+          </EditButton>
+          <DeleteButton type="button" onClick={handleDeleteClick}>
+            삭제
+          </DeleteButton>
+        </BottomRow>
+      )}
     </ItemContainer>
   );
 };

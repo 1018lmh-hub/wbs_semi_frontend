@@ -5,13 +5,8 @@ import Toast from "../components/common/Toast/Toast";
 
 const ToastContext = createContext(null);
 
-const DEFAULT_DURATION = 3000; // 자동으로 사라지는 시간 (ms)
+const DEFAULT_DURATION = 3000;
 
-// 회원가입/로그인/후기작성/즐겨찾기 등 성공(실패) 알림에서 공통으로 쓰는
-// 전역 토스트. main.jsx에서 최상단을 감싸두면 어느 컴포넌트에서든
-// useToast()로 호출 가능.
-// (Toast.jsx / Toast.style.js는 순수 UI라 components/common/Toast/에 그대로 두고,
-//  Context 로직만 AuthContext와 동일하게 src/context/로 이동함)
 export const ToastProvider = ({ children }) => {
   const [toasts, setToasts] = useState([]);
 
@@ -19,13 +14,17 @@ export const ToastProvider = ({ children }) => {
     setToasts((prev) => prev.filter((toast) => toast.id !== id));
   }, []);
 
-  // type: "success" | "error" (theme.color.success / theme.color.danger 참조)
+  // type: "success" | "error"
+  // options: { duration, actionLabel, onAction } - 후기 삭제 등 "취소 가능한" 토스트에서 사용
   const showToast = useCallback(
-    (message, type = "success", duration = DEFAULT_DURATION) => {
+    (message, type = "success", options = {}) => {
+      const { duration = DEFAULT_DURATION, actionLabel, onAction } = options;
       const id = Date.now() + Math.random();
-      setToasts((prev) => [...prev, { id, message, type }]);
+      setToasts((prev) => [
+        ...prev,
+        { id, message, type, actionLabel, onAction },
+      ]);
 
-      // duration 이후 자동 제거 (X 버튼으로도 즉시 제거 가능)
       setTimeout(() => removeToast(id), duration);
     },
     [removeToast],
@@ -40,6 +39,8 @@ export const ToastProvider = ({ children }) => {
             key={toast.id}
             message={toast.message}
             type={toast.type}
+            actionLabel={toast.actionLabel}
+            onAction={toast.onAction}
             onClose={() => removeToast(toast.id)}
           />
         ))}
@@ -48,7 +49,8 @@ export const ToastProvider = ({ children }) => {
   );
 };
 
-// 사용 예시: const { showToast } = useToast(); showToast("회원가입에 성공했습니다.", "success");
+// 사용 예시(기존): showToast("회원가입에 성공했습니다.", "success");
+// 사용 예시(신규, 취소 가능): showToast("후기가 삭제되었습니다.", "error", { duration: 8000, actionLabel: "작업취소", onAction: () => {...} });
 export const useToast = () => {
   const context = useContext(ToastContext);
   if (!context) {

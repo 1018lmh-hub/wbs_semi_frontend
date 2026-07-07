@@ -1,7 +1,12 @@
 // src/features/review/ReviewForm.jsx
-import React, { useState } from "react";
-import { useNavigate, useOutletContext, useParams } from "react-router-dom";
-import { createStationReview } from "../../lib/stationApi";
+import React, { useEffect, useState } from "react";
+import {
+  useNavigate,
+  useOutletContext,
+  useParams,
+  useLocation,
+} from "react-router-dom";
+import { createStationReview, updateStationReview } from "../../lib/stationApi";
 import { useAuth } from "../../context/AuthContext";
 import { useToast } from "../../context/ToastContext";
 import {
@@ -47,17 +52,42 @@ const mapServerFieldErrors = (data) => {
 };
 
 const ReviewForm = () => {
-  const { stationId } = useParams();
+  const { stationId, reviewId } = useParams();
   const navigate = useNavigate();
+  const location = useLocation();
   // MainLayout에서 내려주는 오버레이 닫기 핸들러 (SignUp, StationDetail과 동일 패턴)
   const { onCloseOverlay } = useOutletContext() ?? {};
   const { isLoggedIn } = useAuth();
   const { showToast } = useToast();
 
-  const [form, setForm] = useState(INITIAL_FORM);
+  // reviewId 유무로 수정/작성 모드 구분
+  const isEditMode = !!reviewId;
+  // ReviewItem 수정 버튼 클릭 시 navigate(..., { state: {...} })로 전달된 기존 값
+  const editData = location.state;
+
+  const [form, setForm] = useState(() => {
+    if (isEditMode && editData) {
+      return {
+        title: editData.reviewTitle ?? "",
+        content: editData.reviewContent ?? "",
+        rating: editData.rating ?? 5,
+      };
+    }
+    return INITIAL_FORM;
+  });
   const [fieldErrors, setFieldErrors] = useState({});
   const [serverError, setServerError] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // state로만 데이터를 전달받는 방식이라, 새로고침/직접 URL 접근 등으로
+  // location.state가 없는 상태에서 수정 화면에 들어온 경우 목록으로 되돌려보냄
+  useEffect(() => {
+    if (isEditMode && !editData) {
+      showToast("잘못된 접근입니다. 목록에서 다시 시도해주세요.", "error");
+      navigate(`/stations/${stationId}/reviews`, { replace: true });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -72,7 +102,9 @@ const ReviewForm = () => {
   };
 
   const handleClose = () => {
-    if (onCloseOverlay) {
+    if (window.history.length > 1) {
+      navigate(-1);
+    } else if (onCloseOverlay) {
       onCloseOverlay();
     } else {
       navigate(`/stations/${stationId}`);
@@ -106,15 +138,28 @@ const ReviewForm = () => {
     setIsSubmitting(true);
 
     try {
-      await createStationReview(stationId, {
-        title: form.title,
-        content: form.content,
-        rating: form.rating,
-      });
+      if (isEditMode) {
+        await updateStationReview(stationId, reviewId, {
+          title: form.title,
+          content: form.content,
+          rating: form.rating,
+        });
+        showToast("후기가 수정되었습니다.", "success");
+      } else {
+        await createStationReview(stationId, {
+          title: form.title,
+          content: form.content,
+          rating: form.rating,
+        });
+        showToast("후기가 등록되었습니다.", "success");
+      }
 
-      showToast("후기가 등록되었습니다.", "success");
-      // 등록 후 해당 충전소 상세(후기 미리보기)로 돌아가서 바로 확인 가능하게 함
-      navigate(`/stations/${stationId}`);
+      // 등록/수정 후 이전 페이지로 복귀
+      if (window.history.length > 1) {
+        navigate(-1);
+      } else {
+        navigate(`/stations/${stationId}`);
+      }
     } catch (err) {
       const responseData = err.response?.data;
 
@@ -124,7 +169,9 @@ const ReviewForm = () => {
       } else {
         setServerError(
           responseData?.message ??
-            "후기 등록에 실패했습니다. 잠시 후 다시 시도해주세요.",
+            (isEditMode
+              ? "후기 수정에 실패했습니다. 잠시 후 다시 시도해주세요."
+              : "후기 등록에 실패했습니다. 잠시 후 다시 시도해주세요."),
         );
       }
     } finally {
@@ -142,7 +189,9 @@ const ReviewForm = () => {
           </CloseButton>
         </HeaderRow>
         <AuthGuardBox>
-          <p>후기 작성은 로그인 후 이용할 수 있습니다.</p>
+          <p>
+            후기 {isEditMode ? "수정" : "작성"}은 로그인 후 이용할 수 있습니다.
+          </p>
           <AuthGuardButton type="button" onClick={() => navigate("/login")}>
             로그인하러 가기
           </AuthGuardButton>
@@ -150,6 +199,9 @@ const ReviewForm = () => {
       </FormContainer>
     );
   }
+
+  // editData가 없어 리다이렉트되는 순간까지의 짧은 깜빡임 방지
+  if (isEditMode && !editData) return null;
 
   return (
     <FormContainer>
@@ -159,7 +211,7 @@ const ReviewForm = () => {
         </CloseButton>
       </HeaderRow>
 
-      <Title>후기 작성하기</Title>
+      <Title>{isEditMode ? "후기 수정하기" : "후기 작성하기"}</Title>
 
       {serverError && <ServerErrorBox>{serverError}</ServerErrorBox>}
 
@@ -221,7 +273,13 @@ const ReviewForm = () => {
         </FieldGroup>
 
         <SubmitButton type="submit" disabled={isSubmitting}>
-          {isSubmitting ? "등록 중..." : "등록하기"}
+          {isSubmitting
+            ? isEditMode
+              ? "수정 중..."
+              : "등록 중..."
+            : isEditMode
+              ? "수정하기"
+              : "등록하기"}
         </SubmitButton>
       </Form>
     </FormContainer>

@@ -3,30 +3,27 @@ import React, { createContext, useCallback, useContext, useState } from "react";
 
 const AuthContext = createContext(null);
 
-// PROJECT_CONTEXT의 localStorage 키 컨벤션과 동일하게 유지
-// (axios.js 요청 인터셉터가 STORAGE_KEYS.token을 그대로 읽어서 Authorization 헤더에 붙임)
+// PROJECT_CONTEXT의 localStorage 키 컨벤션에서 memberId를 userId로 통일
+// (review.userId와 동일한 키 이름으로 맞춰 본인 글 판별 시 혼동 방지)
 const STORAGE_KEYS = {
   token: "token",
   refreshToken: "refreshToken",
-  memberId: "memberId",
+  userId: "userId",
   memberName: "memberName",
   role: "role",
 };
 
-// 새로고침해도 로그인 상태가 풀리지 않도록, 초기 state를 localStorage에서 복구
 const getStoredUser = () => {
   const token = localStorage.getItem(STORAGE_KEYS.token);
   if (!token) return null;
 
   return {
-    memberId: localStorage.getItem(STORAGE_KEYS.memberId),
+    userId: localStorage.getItem(STORAGE_KEYS.userId),
     memberName: localStorage.getItem(STORAGE_KEYS.memberName),
     role: localStorage.getItem(STORAGE_KEYS.role),
   };
 };
 
-// main.jsx에서 BrowserRouter 하위, App 상위를 감싸서 사용
-// (ToastProvider와 마찬가지로 어느 컴포넌트에서든 useAuth()로 접근 가능)
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(getStoredUser);
 
@@ -35,12 +32,12 @@ export const AuthProvider = ({ children }) => {
   const login = useCallback((data) => {
     localStorage.setItem(STORAGE_KEYS.token, data.accessToken);
     localStorage.setItem(STORAGE_KEYS.refreshToken, data.refreshToken);
-    localStorage.setItem(STORAGE_KEYS.memberId, data.userId);
+    localStorage.setItem(STORAGE_KEYS.userId, data.userId);
     localStorage.setItem(STORAGE_KEYS.memberName, data.nickname);
     localStorage.setItem(STORAGE_KEYS.role, data.role);
 
     setUser({
-      memberId: data.userId,
+      userId: data.userId,
       memberName: data.nickname,
       role: data.role,
     });
@@ -51,13 +48,8 @@ export const AuthProvider = ({ children }) => {
     setUser(null);
   }, []);
 
-  // 참고: axios.js의 응답 인터셉터도 refreshToken 만료 시 동일한 키들을 지우고
-  // window.location.href = "/login"으로 강제 이동시키는데, 이 경우는 페이지 자체가
-  // 새로고침되므로 AuthProvider가 다시 마운트되며 getStoredUser()로 자연스럽게 로그아웃 상태가 됨
-  // → 별도로 axios.js와 상태를 동기화할 필요는 없음
-
   const value = {
-    user, // { memberId, memberName, role } | null
+    user, // { userId, memberName, role } | null
     isLoggedIn: !!user,
     login,
     logout,

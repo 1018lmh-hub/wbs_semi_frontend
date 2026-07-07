@@ -40,6 +40,7 @@ export const OverlayContent = styled.div`
   overflow-y: auto;
   color: ${theme.color.text};
   font-family: "Noto Sans KR", sans-serif;
+  box-sizing: border-box;
 
   /* 스크롤바 커스텀 (다크테마 매칭) */
   &::-webkit-scrollbar {

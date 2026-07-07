@@ -6,8 +6,8 @@ export const DetailContainer = styled.div`
   display: flex;
   flex-direction: column;
   height: 100%;
-  /* 상하 여백을 줄여서 콘텐츠가 전체적으로 위로 올라오도록 조정 (하단 잘림 방지) */
-  padding: ${theme.space.md} ${theme.space.lg} ${theme.space.lg};
+  /* 충전기 3개 기준으로 100% 줌에서 스크롤 없이 한 화면에 들어오도록 여백 압축 */
+  padding: ${theme.space.sm} ${theme.space.lg} ${theme.space.sm};
 `;
 
 /* CloseButton과 StationName을 같은 줄에 배치 */
@@ -52,26 +52,26 @@ export const StationAddress = styled.p`
 /* TODO: 즐겨찾기 토글 영역 - 즐겨찾기 API 연동 후 구현 */
 
 export const ChargerListSection = styled.section`
-  margin-top: ${theme.space.md};
+  margin-top: ${theme.space.sm};
 `;
 
 export const SectionTitle = styled.h3`
   font-size: ${theme.fontSize.md};
   color: ${theme.color.text};
-  margin-bottom: ${theme.space.sm};
+  margin-bottom: ${theme.space.xs};
 `;
 
 export const ChargerList = styled.ul`
   display: flex;
   flex-direction: column;
-  gap: ${theme.space.sm};
+  gap: ${theme.space.xs};
 `;
 
 export const ChargerItem = styled.li`
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: ${theme.space.sm};
+  padding: ${theme.space.xs};
   border: 1px solid ${theme.color.border};
   border-radius: 8px;
   background-color: ${theme.color.bgSoft};
@@ -97,11 +97,12 @@ export const ChargerStatusLabel = styled.span`
 
 /* 후기 미리보기 / 전체보기 스타일은 ReviewPreview.style.js로 분리됨 */
 
-/* 로그인 사용자에게만 노출되는 후기 작성 버튼 */
+/* NOTE: 후기 작성 버튼은 ReviewPreview.jsx 헤더로 이동되어 이 컴포넌트는
+   더 이상 StationDetail.jsx에서 쓰이지 않음. 필요 없으면 삭제해도 무방 */
 export const WriteReviewButton = styled.button`
-  margin-top: ${theme.space.sm};
+  margin-top: ${theme.space.xs};
   width: 100%;
-  padding: ${theme.space.sm};
+  padding: ${theme.space.xs};
   border: 1px solid ${theme.color.border};
   border-radius: 6px;
   background: none;
