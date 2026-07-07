@@ -59,7 +59,7 @@ const StationDetail = () => {
         if (cancelled) return;
         setReviews(data?.reviews ?? []);
         setAvgRating(data?.avgRating ?? 0);
-        setBookmarked(!!data?.bookmark); // 가정: boolean. 실제 형태 다르면 이 줄만 수정
+        setBookmarked(!!data?.bookmark?.bookmarkNo);
       })
       .catch((err) => {
         if (cancelled) return;
