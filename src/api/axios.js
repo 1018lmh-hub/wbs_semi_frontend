@@ -54,7 +54,7 @@ api.interceptors.response.use(
       return api(original); // 이 설정대로 다시 요청 보내줘
     } catch (e) {
       // refresh토큰도 만료 / 이상한게 -> 로그아웃
-      ["token", "refreshToken", "memberId", "memberName", "role"].forEach((k) =>
+      ["token", "refreshToken", "userId", "memberName", "role"].forEach((k) =>
         localStorage.removeItem(k),
       );
 

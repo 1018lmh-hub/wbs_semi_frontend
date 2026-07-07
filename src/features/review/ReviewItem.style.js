@@ -4,7 +4,7 @@ import { theme } from "../../styles/theme";
 
 // 카드형으로 통일 (기존 ReviewPreview.style.js의 카드 스타일 기준)
 export const ItemContainer = styled.li`
-  padding: ${theme.space.sm};
+  padding: ${theme.space.xs};
   border-radius: 8px;
   background-color: ${theme.color.bgSoft};
   border: 1px solid ${theme.color.border};
@@ -89,4 +89,36 @@ export const ContentText = styled.p`
       : `
     line-height: 1.5;
   `}
+`;
+
+export const BottomRow = styled.div`
+  display: flex;
+  justify-content: flex-end;
+  margin-top: ${theme.space.xs};
+`;
+
+export const EditButton = styled.button`
+  background: none;
+  border: none;
+  padding: 2px ${theme.space.xs};
+  font-size: ${theme.fontSize.xs};
+  color: ${theme.color.sub};
+  cursor: pointer;
+
+  &:hover {
+    color: ${theme.color.accent};
+  }
+`;
+
+export const DeleteButton = styled.button`
+  background: none;
+  border: none;
+  padding: 2px ${theme.space.xs};
+  font-size: ${theme.fontSize.xs};
+  color: ${theme.color.sub};
+  cursor: pointer;
+
+  &:hover {
+    color: ${theme.color.danger};
+  }
 `;

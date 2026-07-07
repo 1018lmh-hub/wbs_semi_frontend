@@ -119,3 +119,21 @@ export const fetchStationReviewList = async (stationNo, page = 1) => {
     throw err;
   }
 };
+
+export const updateStationReview = async (
+  stationNo,
+  reviewNo,
+  { title, content, rating },
+) => {
+  const res = await api.patch(`/stations/${stationNo}/reviews/${reviewNo}`, {
+    reviewTitle: title,
+    reviewContent: content,
+    rating,
+  });
+  return res.data;
+};
+
+export const deleteStationReview = async (stationNo, reviewNo) => {
+  const res = await api.delete(`/stations/${stationNo}/reviews/${reviewNo}`);
+  return res.data;
+};

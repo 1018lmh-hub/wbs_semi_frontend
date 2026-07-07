@@ -9,6 +9,7 @@ import {
   HeaderRow,
   BackButton,
   TitleRow,
+  TitleGroup,
   PageTitle,
   AvgRatingBadge,
   ReviewList as ReviewListWrap,
@@ -20,6 +21,7 @@ import {
   PageArrowButton,
   PageNumberButton,
 } from "./ReviewList.style";
+import { useReviewDeletion } from "./useReviewDeletion";
 
 /**
  * 후기 전체보기 화면 (/stations/:stationId/reviews)
@@ -41,6 +43,13 @@ const ReviewList = () => {
   const [page, setPage] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
+  const { pendingIds, requestDelete } = useReviewDeletion(setReviews);
+
+  const handleDeleteClick = (review) => {
+    requestDelete(stationId, review.reviewNo);
+  };
+
+  // ...기존 useEffect(fetch), handleBack 등 그대로...
 
   useEffect(() => {
     if (!stationId) return;
@@ -139,9 +148,18 @@ const ReviewList = () => {
           ← 뒤로
         </BackButton>
         <TitleRow>
-          <PageTitle>후기 전체보기</PageTitle>
-          {reviews.length > 0 && (
-            <AvgRatingBadge>★ {avgRating.toFixed(1)}</AvgRatingBadge>
+          <TitleGroup>
+            <PageTitle>후기 전체보기</PageTitle>
+            {reviews.length > 0 && (
+              <AvgRatingBadge>★ {avgRating.toFixed(1)}</AvgRatingBadge>
+            )}
+          </TitleGroup>
+
+          {/* 로그인 사용자 대상 후기 작성 버튼 - 어느 페이지에서든 바로 접근 가능하도록 상단 고정 */}
+          {isLoggedIn && (
+            <WriteReviewButton type="button" onClick={handleWriteReview}>
+              후기 작성하기
+            </WriteReviewButton>
           )}
         </TitleRow>
       </HeaderRow>
@@ -158,20 +176,20 @@ const ReviewList = () => {
 
       {!isLoading && !error && reviews.length > 0 && (
         <ReviewListWrap>
-          {reviews.map((review) => (
-            <ReviewItem key={review.reviewNo} review={review} variant="list" />
-          ))}
+          {reviews
+            .filter((review) => !pendingIds.has(review.reviewNo))
+            .map((review) => (
+              <ReviewItem
+                key={review.reviewNo}
+                review={review}
+                variant="list"
+                onDeleteClick={handleDeleteClick}
+              />
+            ))}
         </ReviewListWrap>
       )}
 
       {renderPagination()}
-
-      {/* 로그인 사용자 대상 후기 작성 버튼 - StationDetail과 동일 조건 */}
-      {isLoggedIn && (
-        <WriteReviewButton type="button" onClick={handleWriteReview}>
-          후기 작성하기
-        </WriteReviewButton>
-      )}
 
       {/* TODO: 즐겨찾기 토글 영역 - 즐겨찾기 API 연동 후 구현 (data.bookmark 활용) */}
       {/* TODO: 좋아요(liked) 클릭 인터랙션 - 관련 API 확정 후 구현 */}

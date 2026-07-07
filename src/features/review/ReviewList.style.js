@@ -32,6 +32,13 @@ export const BackButton = styled.button`
 export const TitleRow = styled.div`
   display: flex;
   align-items: center;
+  justify-content: space-between;
+  gap: ${theme.space.sm};
+`;
+
+export const TitleGroup = styled.div`
+  display: flex;
+  align-items: center;
   gap: ${theme.space.sm};
 `;
 
@@ -80,14 +87,15 @@ export const ErrorMessage = styled.p`
 `;
 
 export const WriteReviewButton = styled.button`
-  align-self: center;
+  flex-shrink: 0;
   background-color: ${theme.color.primary};
   color: ${theme.color.headerText};
   border: none;
   border-radius: 6px;
-  padding: ${theme.space.sm} ${theme.space.lg};
-  font-size: ${theme.fontSize.sm};
+  padding: ${theme.space.xs} ${theme.space.sm};
+  font-size: ${theme.fontSize.xs};
   cursor: pointer;
+  white-space: nowrap;
 
   &:hover {
     background-color: ${theme.color.primarySoft};

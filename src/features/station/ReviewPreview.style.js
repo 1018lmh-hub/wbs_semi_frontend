@@ -3,8 +3,8 @@ import styled from "styled-components";
 import { theme } from "../../styles/theme";
 
 export const PreviewContainer = styled.section`
-  margin-top: ${theme.space.lg};
-  padding-top: ${theme.space.md};
+  margin-top: ${theme.space.sm};
+  padding-top: ${theme.space.sm};
   border-top: 1px solid ${theme.color.border};
 `;
 
@@ -12,7 +12,7 @@ export const PreviewHeader = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: ${theme.space.sm};
+  margin-bottom: ${theme.space.xs};
 `;
 
 export const TitleRow = styled.div`
@@ -32,22 +32,44 @@ export const AvgRatingBadge = styled.span`
   font-weight: bold;
 `;
 
-export const ViewAllButton = styled.button`
-  background: none;
+export const WriteReviewButton = styled.button`
+  flex-shrink: 0;
+  background-color: ${theme.color.primary};
+  color: ${theme.color.headerText};
   border: none;
+  border-radius: 6px;
+  padding: ${theme.space.xs} ${theme.space.sm};
   font-size: ${theme.fontSize.xs};
+  cursor: pointer;
+  white-space: nowrap;
+
+  &:hover {
+    background-color: ${theme.color.primarySoft};
+  }
+`;
+
+export const ViewAllButton = styled.button`
+  display: block;
+  width: 100%;
+  margin-top: ${theme.space.xs};
+  background: none;
+  border: 1px solid ${theme.color.border};
+  border-radius: 6px;
+  padding: ${theme.space.xs};
+  font-size: ${theme.fontSize.sm};
   color: ${theme.color.sub};
   cursor: pointer;
 
   &:hover {
     color: ${theme.color.text};
+    border-color: ${theme.color.sub};
   }
 `;
 
 export const ReviewList = styled.ul`
   display: flex;
   flex-direction: column;
-  gap: ${theme.space.sm};
+  gap: ${theme.space.xs};
 `;
 
 export const EmptyMessage = styled.p`

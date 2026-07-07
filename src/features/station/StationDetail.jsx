@@ -1,6 +1,6 @@
 // src/features/station/StationDetail.jsx
 import React from "react";
-import { useNavigate, useParams, useOutletContext } from "react-router-dom";
+import { useParams, useOutletContext } from "react-router-dom";
 import {
   DetailContainer,
   TitleRow,
@@ -14,15 +14,11 @@ import {
   ChargerName,
   ChargerModeLabel,
   ChargerStatusLabel,
-  WriteReviewButton,
 } from "./StationDetail.style";
 import ReviewPreview from "./ReviewPreview";
-import { useAuth } from "../../context/AuthContext";
 
 const StationDetail = () => {
   const { stationId } = useParams();
-  const navigate = useNavigate();
-  const { isLoggedIn } = useAuth();
 
   // MainLayout에서 Map.jsx의 onLocationsLoaded를 통해 끌어올린 전체 충전소 목록과
   // 오버레이 닫기 핸들러를 Outlet context로 전달받아 사용
@@ -78,18 +74,8 @@ const StationDetail = () => {
         </ChargerList>
       </ChargerListSection>
 
-      {/* 후기 미리보기 + 전체보기 버튼 (평균 별점 포함) */}
+      {/* 후기 미리보기 + 전체보기 + 후기 작성하기(헤더 우측, 로그인 시) */}
       <ReviewPreview stationNo={stationId} />
-
-      {/* 로그인 사용자 대상 후기 작성 버튼 - 비로그인 시에는 노출하지 않음 */}
-      {isLoggedIn && (
-        <WriteReviewButton
-          type="button"
-          onClick={() => navigate(`/stations/${stationId}/reviews/form`)}
-        >
-          후기 작성하기
-        </WriteReviewButton>
-      )}
     </DetailContainer>
   );
 };

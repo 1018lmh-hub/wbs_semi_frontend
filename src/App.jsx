@@ -46,6 +46,10 @@ function App() {
           path="stations/:stationId/reviews/form"
           element={<ReviewForm />}
         />
+        <Route
+          path="stations/:stationId/reviews/:reviewId/edit"
+          element={<ReviewForm />}
+        />
         <Route path="stations/:stationId/reviews" element={<ReviewList />} />
 
         {/* 404 라우트 */}
