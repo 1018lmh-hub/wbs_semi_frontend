@@ -10,7 +10,7 @@ import {
   Title,
   Nickname,
   Meta,
-  LikeCount,
+  LikeButton,
   DateText,
   ContentText,
   BottomRow,
@@ -26,11 +26,22 @@ const formatDate = (isoString) => (isoString ? isoString.slice(0, 10) : "");
  *   부모(ReviewList/ReviewPreview)가 useReviewDeletion의 requestDelete를 연결해서 넘겨줌.
  *   전달하지 않으면 삭제 버튼 자체가 렌더링되지 않음.
  */
-const ReviewItem = ({ review, variant = "list", onDeleteClick }) => {
+const ReviewItem = ({
+  review,
+  variant = "list",
+  onDeleteClick,
+  onLikeClick,
+  isLikePending,
+}) => {
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const { user, isLoggedIn } = useAuth();
 
   const isOwner = !!user && user.userId === review.userId;
+
+  const handleLikeClick = () => {
+    if (!isLoggedIn) return; // 버튼은 보이되 비로그인 시 클릭 무시 (disabled 처리와 이중 방어)
+    onLikeClick?.(review);
+  };
 
   const handleEditClick = () => {
     navigate(`/stations/${review.stationNo}/reviews/${review.reviewNo}/edit`, {
@@ -63,7 +74,15 @@ const ReviewItem = ({ review, variant = "list", onDeleteClick }) => {
           <Nickname>{review.nickname}</Nickname>
         </TitleBlock>
         <Meta>
-          <LikeCount>좋아요 {review.likeCount}</LikeCount>
+          <LikeButton
+            type="button"
+            onClick={handleLikeClick}
+            disabled={!isLoggedIn || isLikePending}
+            $liked={review.liked}
+            aria-label={review.liked ? "좋아요 취소" : "좋아요"}
+          >
+            👍 {review.likeCount}
+          </LikeButton>
           <DateText>{formatDate(review.createDate)}</DateText>
         </Meta>
       </TopRow>

@@ -137,3 +137,17 @@ export const deleteStationReview = async (stationNo, reviewNo) => {
   const res = await api.delete(`/stations/${stationNo}/reviews/${reviewNo}`);
   return res.data;
 };
+
+export const addReviewLike = async (stationNo, reviewNo) => {
+  const res = await api.post(
+    `/stations/${stationNo}/reviews/${reviewNo}/likes`,
+  );
+  return res.data;
+};
+
+export const deleteReviewLike = async (stationNo, reviewNo) => {
+  const res = await api.delete(
+    `/stations/${stationNo}/reviews/${reviewNo}/likes`,
+  );
+  return res.data;
+};

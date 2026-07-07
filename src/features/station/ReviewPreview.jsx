@@ -18,6 +18,7 @@ import {
   ErrorMessage,
 } from "./ReviewPreview.style";
 import { useReviewDeletion } from "../review/useReviewDeletion";
+import { useReviewLike } from "../review/useReviewLike";
 
 /**
  * StationDetail 하단에 표시되는 후기 미리보기 영역.
@@ -42,9 +43,14 @@ const ReviewPreview = ({ stationNo, maxPreviewCount = 3, onViewAllClick }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
   const { pendingIds, requestDelete } = useReviewDeletion(setReviews);
+  const { pendingLikeIds, toggleLike } = useReviewLike(setReviews);
 
   const handleDeleteClick = (review) => {
     requestDelete(stationNo, review.reviewNo);
+  };
+
+  const handleLikeClick = (review) => {
+    toggleLike(stationNo, review);
   };
 
   useEffect(() => {
@@ -133,6 +139,8 @@ const ReviewPreview = ({ stationNo, maxPreviewCount = 3, onViewAllClick }) => {
               review={review}
               variant="preview"
               onDeleteClick={handleDeleteClick}
+              onLikeClick={handleLikeClick}
+              isLikePending={pendingLikeIds.has(review.reviewNo)}
             />
           ))}
         </ReviewList>

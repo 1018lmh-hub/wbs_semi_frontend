@@ -63,9 +63,27 @@ export const Meta = styled.div`
   flex-shrink: 0;
 `;
 
-export const LikeCount = styled.span`
+// 기존 export const LikeCount = styled.span`...` 삭제하고 아래로 교체
+
+export const LikeButton = styled.button`
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: none;
+  border: none;
+  padding: 0;
   font-size: ${theme.fontSize.xs};
-  color: ${theme.color.sub};
+  color: ${({ $liked }) => ($liked ? theme.color.accent : theme.color.sub)};
+  cursor: pointer;
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  &:hover:not(:disabled) {
+    color: ${theme.color.accent};
+  }
 `;
 
 export const DateText = styled.span`
