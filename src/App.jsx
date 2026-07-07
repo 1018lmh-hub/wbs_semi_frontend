@@ -10,6 +10,10 @@ import ReviewForm from "./features/review/ReviewForm";
 import SignUp from "./features/user/SignUp";
 import Login from "./features/user/Login";
 import ReviewList from "./features/review/ReviewList";
+import MyPage from "./features/user/MyPage";
+import MyPageEdit from "./features/user/MyPageEdit";
+import MyPagePassword from "./features/user/MyPagePassword";
+import MyPageWithdraw from "./features/user/MyPageWithdraw";
 
 // 화면 레이아웃 및 중첩 라우팅 테스트를 위한 임시(Dummy) 컴포넌트
 const DummyPage = ({ title }) => (
@@ -37,6 +41,10 @@ function App() {
         {/* 임시 라우트 연결 (URL 변경 시 오버레이 영역에 표출) */}
         <Route path="login" element={<Login />} />
         <Route path="signup" element={<SignUp />} />
+        <Route path="myPage" element={<MyPage />} />
+        <Route path="myPage/edit" element={<MyPageEdit />} />
+        <Route path="myPage/password" element={<MyPagePassword />} />
+        <Route path="myPage/withdraw" element={<MyPageWithdraw />} />
         <Route path="boards" element={<DummyPage title="게시판 목록" />} />
 
         {/* 신규 추가: 지도 마커 클릭 시 이동하는 충전소 상세 라우트 */}
