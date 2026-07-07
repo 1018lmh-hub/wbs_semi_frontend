@@ -13,6 +13,7 @@ import ReviewList from "./features/review/ReviewList";
 import BoardLayout from "./features/board/BoardLayout";
 import BoardHome from "./features/board/BoardHome";
 import BoardList from "./features/board/BoardList";
+import BoardDetail from "./features/board/BoardDetail";
 import MyPage from "./features/user/MyPage";
 import MyPageEdit from "./features/user/MyPageEdit";
 import MyPagePassword from "./features/user/MyPagePassword";
@@ -55,7 +56,7 @@ function App() {
           />
           <Route
             path="notices/:noticeNo"
-            element={<DummyPage title="공지사항 상세" />}
+            element={<BoardDetail boardType="notice" />}
           />
           <Route
             path="notices/:noticeNo/edit"
@@ -70,7 +71,7 @@ function App() {
           />
           <Route
             path="inquirys/:inquiryNo"
-            element={<DummyPage title="문의글 상세" />}
+            element={<BoardDetail boardType="inquiry" />}
           />
           <Route
             path="inquirys/:inquiryNo/edit"
