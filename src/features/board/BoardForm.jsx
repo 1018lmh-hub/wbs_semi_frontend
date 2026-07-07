@@ -114,6 +114,15 @@ const BoardForm = ({ boardType }) => {
       navigate(routeConfig.listPath);
     }
   };
+  // Textarea는 기본적으로 Enter가 줄바꿈으로 처리되어 폼이 제출되지 않으므로,
+  // Enter만 누르면 제출, Shift+Enter는 줄바꿈이 되도록 별도 처리
+  // (Input(제목)은 브라우저 기본 동작으로 이미 Enter 시 폼 제출됨)
+  const handleContentKeyDown = (e) => {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      e.currentTarget.form?.requestSubmit();
+    }
+  };
 
   const validate = () => {
     const errors = {};
@@ -247,6 +256,7 @@ const BoardForm = ({ boardType }) => {
             name="content"
             value={form.content}
             onChange={handleChange}
+            onKeyDown={handleContentKeyDown}
             placeholder={`1~${CONTENT_MAX}자로 입력해주세요`}
             maxLength={CONTENT_MAX}
             $hasError={!!fieldErrors.content}
