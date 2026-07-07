@@ -1,7 +1,6 @@
 // src/features/station/ReviewPreview.jsx
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { useNavigate } from "react-router-dom";
-import { fetchStationReviews } from "../../lib/stationApi";
 import { useAuth } from "../../context/AuthContext";
 import ReviewItem from "../review/ReviewItem";
 import {
@@ -22,26 +21,23 @@ import { useReviewLike } from "../review/useReviewLike";
 
 /**
  * StationDetail 하단에 표시되는 후기 미리보기 영역.
- * - GET /api/stations/{stationNo} 응답의 reviews / avgRating을 사용
- * - reviews 중 앞쪽 maxPreviewCount개만 노출, 나머지는 "전체보기"로 이동
- *
- * 리스트 아이템 렌더링은 features/review/ReviewItem 공통 컴포넌트를 사용
- * (ReviewList.jsx - 후기 전체보기 - 와 레이아웃 공유)
- *
- * 헤더 우측: 로그인 사용자 대상 "후기 작성하기" (ReviewList와 동일 위치/스타일로 통일)
- * 리스트 하단: "전체보기" (기존 헤더 위치에서 이동)
- *
- * 스코프 밖(다음 작업 예정):
- * - bookmark(즐겨찾기) 토글 — 응답에는 포함되어 오지만 이번 컴포넌트에서는 사용하지 않음
+ * - (변경) 데이터 fetch는 더 이상 이 컴포넌트가 하지 않음.
+ *   북마크 별과 같은 API(GET /stations/{stationNo})를 사용하기 때문에
+ *   StationDetail이 한 번만 호출하고 reviews/avgRating/isLoading/error/setReviews를 내려줌.
  */
-const ReviewPreview = ({ stationNo, maxPreviewCount = 3, onViewAllClick }) => {
+const ReviewPreview = ({
+  stationNo,
+  reviews,
+  avgRating,
+  isLoading,
+  error,
+  setReviews,
+  maxPreviewCount = 3,
+  onViewAllClick,
+}) => {
   const navigate = useNavigate();
   const { isLoggedIn } = useAuth();
 
-  const [reviews, setReviews] = useState([]);
-  const [avgRating, setAvgRating] = useState(0);
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState(null);
   const { pendingIds, requestDelete } = useReviewDeletion(setReviews);
   const { pendingLikeIds, toggleLike } = useReviewLike(setReviews);
 
@@ -52,34 +48,6 @@ const ReviewPreview = ({ stationNo, maxPreviewCount = 3, onViewAllClick }) => {
   const handleLikeClick = (review) => {
     toggleLike(stationNo, review);
   };
-
-  useEffect(() => {
-    if (!stationNo) return;
-
-    let cancelled = false;
-    setIsLoading(true);
-    setError(null);
-
-    fetchStationReviews(stationNo)
-      .then((data) => {
-        if (cancelled) return;
-        setReviews(data?.reviews ?? []);
-        setAvgRating(data?.avgRating ?? 0);
-        // TODO: 즐겨찾기 영역 구현 시 data.bookmark 사용
-      })
-      .catch((err) => {
-        if (cancelled) return;
-        console.error("후기 정보를 불러오지 못했습니다:", err);
-        setError(err);
-      })
-      .finally(() => {
-        if (!cancelled) setIsLoading(false);
-      });
-
-    return () => {
-      cancelled = true;
-    };
-  }, [stationNo]);
 
   const handleViewAll = () => {
     if (onViewAllClick) {
@@ -147,8 +115,6 @@ const ReviewPreview = ({ stationNo, maxPreviewCount = 3, onViewAllClick }) => {
       )}
 
       <ViewAllButton onClick={handleViewAll}>전체보기</ViewAllButton>
-
-      {/* TODO: 즐겨찾기 토글 영역 - 즐겨찾기 API 연동 후 구현 (data.bookmark 활용) */}
     </PreviewContainer>
   );
 };

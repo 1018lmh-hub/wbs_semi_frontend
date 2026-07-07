@@ -151,3 +151,13 @@ export const deleteReviewLike = async (stationNo, reviewNo) => {
   );
   return res.data;
 };
+
+export const addBookmark = async (stationNo) => {
+  const res = await api.post(`/stations/${stationNo}/bookmarks`);
+  return res.data;
+};
+
+export const deleteBookmark = async (stationNo) => {
+  const res = await api.delete(`/stations/${stationNo}/bookmarks`);
+  return res.data;
+};
