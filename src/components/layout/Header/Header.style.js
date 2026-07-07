@@ -1,71 +1,72 @@
-// src/components/layout/Header/Header.style.js
-import styled from "styled-components";
-import { theme } from "../../../styles/theme";
+// src/components/layout/Header/Header.jsx
+import React from "react";
+import { useNavigate } from "react-router-dom";
+import {
+  HeaderContainer,
+  LeftSection,
+  MenuButton,
+  LogoWrapper,
+  LogoImage,
+  AuthContainer,
+  AuthItem,
+} from "./Header.style";
+import logoDark from "../../../assets/plugin-logo-dark.png";
+import { useAuth } from "../../../context/AuthContext";
 
-export const HeaderContainer = styled.header`
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: ${theme.size.headerHeight};
-  background-color: ${theme.color.headerBg};
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 0 ${theme.space.md};
-  z-index: 1000;
-  box-sizing: border-box;
-`;
+const Header = ({ toggleSidebar }) => {
+  const navigate = useNavigate();
 
-export const LeftSection = styled.div`
-  display: flex;
-  align-items: center;
-  gap: ${theme.space.md};
-`;
+  // 임시값(isLoggedIn = false) 대신 AuthContext의 실제 로그인 상태 사용
+  const { isLoggedIn, logout } = useAuth();
 
-export const MenuButton = styled.button`
-  background: none;
-  border: none;
-  color: ${theme.color.headerText};
-  font-size: ${theme.fontSize.xl};
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  padding: 0;
-  transition: color 0.2s ease-in-out;
+  const handleNavigation = (path) => {
+    navigate(path);
+  };
 
-  &:hover {
-    color: ${theme.color.accent};
-  }
-`;
+  const handleLogout = () => {
+    // AuthContext.logout()이 localStorage 정리 + 전역 로그인 상태 갱신을 함께 처리
+    logout();
+    navigate("/");
+  };
 
-export const LogoWrapper = styled.div`
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-`;
+  return (
+    <HeaderContainer>
+      <LeftSection>
+        <LogoWrapper onClick={() => handleNavigation("/")}>
+          <LogoImage src={logoDark} alt="Plug-in Logo" />
+        </LogoWrapper>
+      </LeftSection>
 
-export const LogoImage = styled.img`
-  height: 32px;
-  width: auto;
-  display: block;
-  margin-top: 6px;
-`;
+      <AuthContainer>
+        {/* 게시판 진입 버튼: 로그인/비로그인 상태 상관없이 맨 왼쪽에 고정 노출 */}
+        <AuthItem onClick={() => handleNavigation("/boards")}>게시판</AuthItem>
 
-export const AuthContainer = styled.div`
-  display: flex;
-  gap: ${theme.space.md};
-`;
+        {isLoggedIn ? (
+          <>
+            <AuthItem onClick={() => handleNavigation("/myPage")}>
+              마이페이지
+            </AuthItem>
+            <AuthItem onClick={() => handleNavigation("/bookmarks")}>
+              즐겨찾기
+            </AuthItem>
+            <AuthItem onClick={handleLogout}>로그아웃</AuthItem>
+          </>
+        ) : (
+          <>
+            <AuthItem onClick={() => handleNavigation("/login")}>
+              로그인
+            </AuthItem>
+            <AuthItem onClick={() => handleNavigation("/signup")}>
+              회원가입
+            </AuthItem>
+            <MenuButton onClick={toggleSidebar} aria-label="메뉴 열기">
+              ☰
+            </MenuButton>
+          </>
+        )}
+      </AuthContainer>
+    </HeaderContainer>
+  );
+};
 
-export const AuthItem = styled.div`
-  margin-top: 7px;
-  color: ${theme.color.sub};
-  font-family: "Noto Sans KR", sans-serif;
-  font-size: ${theme.fontSize.sm};
-  cursor: pointer;
-  transition: color 0.2s ease-in-out;
-
-  &:hover {
-    color: ${theme.color.headerText};
-  }
-`;
+export default Header;

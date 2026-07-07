@@ -11,10 +11,10 @@ import {
 
 // 오버레이가 열려야 하는 경로 목록
 // (기존 isSidebarOpen 상태값 대신, 라우팅이 열림 상태를 사실상 관리)
-// "/stations/..."는 그 아래 하위 경로(상세, 후기 작성 폼 등)가 계속 늘어날 예정이라
+// "/stations/", "/notices", "/inquiries"는 하위 경로(상세/작성/수정 등)가 계속 늘어날 예정이라
 // 매번 배열에 추가하지 않도록 접두사(prefix)로 통째로 처리
 const EXACT_OVERLAY_ROUTES = ["/login", "/signup", "/boards"];
-const OVERLAY_PREFIX_ROUTES = ["/stations/"];
+const OVERLAY_PREFIX_ROUTES = ["/stations/", "/notices", "/inquiries"];
 
 const MainLayout = () => {
   const location = useLocation();
