@@ -56,3 +56,34 @@ export const fetchBoardList = async (boardType, page = 1) => {
     throw err;
   }
 };
+
+/**
+ * 공지사항/문의글 공용 상세 조회.
+ * 목록과 동일하게 title/content/boardNo로 필드명을 통일해서 반환한다.
+ *
+ * @param {"notice"|"inquiry"} boardType
+ * @param {string|number} boardNo
+ */
+export const fetchBoardDetail = async (boardType, boardNo) => {
+  const config = BOARD_CONFIG[boardType];
+
+  try {
+    const res = await api.get(`${config.path}/${boardNo}`);
+    const item = res.data.data;
+
+    return {
+      boardNo: item[config.noKey],
+      userId: item.userId,
+      nickname: item.nickname,
+      title: item[config.titleKey],
+      content: item[config.contentKey],
+      count: item.count,
+      createDate: item.createDate,
+      modifyDate: item.modifyDate,
+      status: item.status,
+    };
+  } catch (err) {
+    // 존재하지 않는 게시글(400) 등은 컴포넌트에서 처리하도록 그대로 던짐
+    throw err;
+  }
+};
