@@ -17,16 +17,7 @@ import {
   EditButton,
   DeleteButton,
 } from "./ReviewItem.style";
-
-const DEFAULT_PROFILE_IMAGE =
-  "data:image/svg+xml;utf8," +
-  encodeURIComponent(
-    `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'>` +
-      `<rect width='40' height='40' rx='20' fill='#243754'/>` +
-      `<circle cx='20' cy='16' r='7' fill='#8A99AD'/>` +
-      `<path d='M6 34c0-8 6-12 14-12s14 4 14 12' fill='#8A99AD'/>` +
-      `</svg>`,
-  );
+import { DEFAULT_PROFILE_IMAGE } from "../../lib/defaultProfileImage";
 
 const formatDate = (isoString) => (isoString ? isoString.slice(0, 10) : "");
 
