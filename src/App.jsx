@@ -14,6 +14,7 @@ import BoardLayout from "./features/board/BoardLayout";
 import BoardHome from "./features/board/BoardHome";
 import BoardList from "./features/board/BoardList";
 import BoardDetail from "./features/board/BoardDetail";
+import BoardForm from "./features/board/BoardForm";
 import MyPage from "./features/user/MyPage";
 import MyPageEdit from "./features/user/MyPageEdit";
 import MyPagePassword from "./features/user/MyPagePassword";
@@ -52,7 +53,7 @@ function App() {
           <Route path="notices" element={<BoardList boardType="notice" />} />
           <Route
             path="notices/form"
-            element={<DummyPage title="공지사항 작성" />}
+            element={<BoardForm boardType="notice" />}
           />
           <Route
             path="notices/:noticeNo"
@@ -60,14 +61,14 @@ function App() {
           />
           <Route
             path="notices/:noticeNo/edit"
-            element={<DummyPage title="공지사항 수정" />}
+            element={<BoardForm boardType="notice" />}
           />
 
           {/* 백엔드 표기 "inquirys"에 맞춰 경로 통일, 표시 텍스트는 한글 유지 */}
           <Route path="inquirys" element={<BoardList boardType="inquiry" />} />
           <Route
             path="inquirys/form"
-            element={<DummyPage title="문의글 작성" />}
+            element={<BoardForm boardType="inquiry" />}
           />
           <Route
             path="inquirys/:inquiryNo"
@@ -75,7 +76,7 @@ function App() {
           />
           <Route
             path="inquirys/:inquiryNo/edit"
-            element={<DummyPage title="문의글 수정" />}
+            element={<BoardForm boardType="inquiry" />}
           />
         </Route>
 
