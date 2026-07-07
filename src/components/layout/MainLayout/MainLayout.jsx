@@ -1,5 +1,5 @@
 // src/components/layout/MainLayout/MainLayout.jsx
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Outlet, useLocation, useNavigate } from "react-router-dom";
 import Header from "../Header/Header";
 import Map from "../../../features/map/Map";
@@ -10,11 +10,19 @@ import {
 } from "./MainLayout.style";
 
 // 오버레이가 열려야 하는 경로 목록
-// (기존 isSidebarOpen 상태값 대신, 라우팅이 열림 상태를 사실상 관리)
-// "/stations/..."는 그 아래 하위 경로(상세, 후기 작성 폼 등)가 계속 늘어날 예정이라
-// 매번 배열에 추가하지 않도록 접두사(prefix)로 통째로 처리
-const EXACT_OVERLAY_ROUTES = ["/login", "/signup", "/boards"];
-const OVERLAY_PREFIX_ROUTES = ["/stations/", "/myPage"];
+// "/stations/", "/notices", "/inquirys", "/myPage"는 하위 경로(상세/작성/수정 등)가
+// 계속 늘어날 예정이라 매번 배열에 추가하지 않도록 접두사(prefix)로 통째로 처리
+const EXACT_OVERLAY_ROUTES = ["/login", "/signup"];
+const OVERLAY_PREFIX_ROUTES = [
+  "/stations/",
+  "/myPage",
+  "/notices",
+  "/inquirys",
+];
+
+const matchesOverlayRoute = (pathname) =>
+  EXACT_OVERLAY_ROUTES.includes(pathname) ||
+  OVERLAY_PREFIX_ROUTES.some((prefix) => pathname.startsWith(prefix));
 
 const MainLayout = () => {
   const location = useLocation();
@@ -25,17 +33,23 @@ const MainLayout = () => {
   // (전용 단건 조회 API가 아직 없어 목록에서 stationNo로 찾는 방식)
   const [locations, setLocations] = useState([]);
 
-  const isOverlayOpen =
-    EXACT_OVERLAY_ROUTES.includes(location.pathname) ||
-    OVERLAY_PREFIX_ROUTES.some((prefix) =>
-      location.pathname.startsWith(prefix),
-    );
+  // 헤더 ☰ 버튼 클릭 시 다시 열어줄 "마지막으로 열려 있던 오버레이 경로".
+  // 종류(로그인/공지/문의/충전소/마이페이지 등) 상관없이 오버레이 경로면 전부 여기에 저장.
+  // 한 번도 방문한 적 없으면 공지사항 목록(/notices)을 기본값으로 사용.
+  const [lastOverlayPath, setLastOverlayPath] = useState("/notices");
 
-  // 헤더 햄버거 버튼: 오버레이가 라우트 기반으로 바뀌면서 이전의 boolean 토글은
-  // 의미가 없어져, "닫혀있으면 /boards로 이동해서 열고 / 열려있으면 /로 이동해서 닫는다"로 대체.
-  // (메뉴 버튼의 정확한 목적지는 기획에 따라 조정 필요 — 우선 /boards로 가정)
+  useEffect(() => {
+    if (matchesOverlayRoute(location.pathname)) {
+      setLastOverlayPath(location.pathname);
+    }
+  }, [location.pathname]);
+
+  const isOverlayOpen = matchesOverlayRoute(location.pathname);
+
+  // 헤더 ☰ 버튼: 닫혀있으면 마지막으로 열려 있던 경로를 그대로 재오픈,
+  // 이미 열려있으면 닫는다.
   const toggleSidebar = () => {
-    navigate(isOverlayOpen ? "/" : "/boards");
+    navigate(isOverlayOpen ? "/" : lastOverlayPath);
   };
 
   // Map 마커 클릭 시: 기존 인포윈도우 표시는 Map.jsx 내부에서 그대로 유지되고,

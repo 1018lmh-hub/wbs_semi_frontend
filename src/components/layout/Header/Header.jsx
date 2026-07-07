@@ -38,6 +38,9 @@ const Header = ({ toggleSidebar }) => {
       </LeftSection>
 
       <AuthContainer>
+        {/* 게시판 진입 버튼: 로그인/비로그인 상태 상관없이 맨 왼쪽에 고정 노출.
+            항상 공지사항(/notices)으로 진입 — 이후 BoardLayout 탭으로 문의게시판 이동 가능 */}
+        <AuthItem onClick={() => handleNavigation("/notices")}>게시판</AuthItem>
         {isLoggedIn ? (
           <>
             <AuthItem onClick={() => handleNavigation("/myPage")}>
@@ -56,11 +59,12 @@ const Header = ({ toggleSidebar }) => {
             <AuthItem onClick={() => handleNavigation("/signup")}>
               회원가입
             </AuthItem>
-            <MenuButton onClick={toggleSidebar} aria-label="메뉴 열기">
-              ☰
-            </MenuButton>
           </>
         )}
+        {/* 햄버거 메뉴: 로그인 여부와 무관하게 항상 노출 */}
+        <MenuButton onClick={toggleSidebar} aria-label="메뉴 열기">
+          ☰
+        </MenuButton>
       </AuthContainer>
     </HeaderContainer>
   );
