@@ -86,7 +86,9 @@ export async function fetchChargingStations(endpoint = "/charging-stations") {
 
 export const fetchStationReviews = async (stationNo) => {
   try {
-    const res = await api.get(`/stations/${stationNo}`);
+    const res = await api.get(`/stations/${stationNo}`, {
+      params: { _t: Date.now() }, // 캐시 우회용 - 매 요청마다 다른 쿼리스트링으로 만들어 브라우저가 새로 요청하게 함
+    });
     return res.data.data;
   } catch (err) {
     if (err.response?.data?.code === 400) {
@@ -135,5 +137,29 @@ export const updateStationReview = async (
 
 export const deleteStationReview = async (stationNo, reviewNo) => {
   const res = await api.delete(`/stations/${stationNo}/reviews/${reviewNo}`);
+  return res.data;
+};
+
+export const addReviewLike = async (stationNo, reviewNo) => {
+  const res = await api.post(
+    `/stations/${stationNo}/reviews/${reviewNo}/likes`,
+  );
+  return res.data;
+};
+
+export const deleteReviewLike = async (stationNo, reviewNo) => {
+  const res = await api.delete(
+    `/stations/${stationNo}/reviews/${reviewNo}/likes`,
+  );
+  return res.data;
+};
+
+export const addBookmark = async (stationNo) => {
+  const res = await api.post(`/stations/${stationNo}/bookmarks`);
+  return res.data;
+};
+
+export const deleteBookmark = async (stationNo) => {
+  const res = await api.delete(`/stations/${stationNo}/bookmarks`);
   return res.data;
 };

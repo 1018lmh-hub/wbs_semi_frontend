@@ -22,6 +22,7 @@ import {
   PageNumberButton,
 } from "./ReviewList.style";
 import { useReviewDeletion } from "./useReviewDeletion";
+import { useReviewLike } from "./useReviewLike";
 
 /**
  * 후기 전체보기 화면 (/stations/:stationId/reviews)
@@ -44,6 +45,9 @@ const ReviewList = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
   const { pendingIds, requestDelete } = useReviewDeletion(setReviews);
+  const { pendingLikeIds, toggleLike } = useReviewLike(setReviews);
+  const handleLikeClick = (review) =>
+    toggleLike(stationId /* 또는 stationNo */, review);
 
   const handleDeleteClick = (review) => {
     requestDelete(stationId, review.reviewNo);
@@ -182,8 +186,10 @@ const ReviewList = () => {
               <ReviewItem
                 key={review.reviewNo}
                 review={review}
-                variant="list"
+                variant="list" // 또는 "preview"
                 onDeleteClick={handleDeleteClick}
+                onLikeClick={handleLikeClick}
+                isLikePending={pendingLikeIds.has(review.reviewNo)}
               />
             ))}
         </ReviewListWrap>
