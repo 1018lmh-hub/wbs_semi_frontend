@@ -18,6 +18,7 @@ const OVERLAY_PREFIX_ROUTES = [
   "/myPage",
   "/notices",
   "/inquirys",
+  "/bookmarks",
 ];
 
 const matchesOverlayRoute = (pathname) =>
