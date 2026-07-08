@@ -142,3 +142,25 @@ export const PageNumberButton = styled.button`
       $isActive ? theme.color.primary : theme.color.bgSoft};
   }
 `;
+
+export const SortToggleGroup = styled.div`
+  display: flex;
+  gap: ${theme.space.xs};
+`;
+
+export const SortToggleButton = styled.button`
+  background-color: ${({ $isActive }) =>
+    $isActive ? theme.color.primary : "transparent"};
+  color: ${({ $isActive }) =>
+    $isActive ? theme.color.headerText : theme.color.sub};
+  border: 1px solid ${theme.color.border};
+  border-radius: 12px;
+  padding: 2px ${theme.space.sm};
+  font-size: ${theme.fontSize.xs};
+  cursor: pointer;
+
+  &:hover {
+    color: ${theme.color.headerText};
+    border-color: ${theme.color.accent};
+  }
+`;
