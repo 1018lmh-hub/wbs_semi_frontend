@@ -23,6 +23,13 @@ export const TitleBlock = styled.div`
   min-width: 0;
 `;
 
+export const TitleRow = styled.div`
+  display: flex;
+  align-items: center;
+  gap: ${theme.space.xs};
+  min-width: 0;
+`;
+
 export const Title = styled.p`
   font-size: ${theme.fontSize.sm};
   font-weight: bold;
@@ -30,6 +37,19 @@ export const Title = styled.p`
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  min-width: 0;
+`;
+
+// 문의글 답변 등록 여부 뱃지 (hasComment === true일 때만 렌더)
+export const AnsweredBadge = styled.span`
+  flex-shrink: 0;
+  font-size: ${theme.fontSize.xs};
+  color: ${theme.color.accent};
+  background-color: ${theme.color.bg};
+  border: 1px solid ${theme.color.accent};
+  border-radius: 10px;
+  padding: 1px ${theme.space.xs};
+  white-space: nowrap;
 `;
 
 export const Nickname = styled.span`
@@ -55,18 +75,4 @@ export const CountText = styled.span`
 export const DateText = styled.span`
   font-size: ${theme.fontSize.xs};
   color: ${theme.color.sub};
-`;
-
-export const DeleteButton = styled.button`
-  flex-shrink: 0;
-  background: none;
-  border: none;
-  padding: 2px ${theme.space.xs};
-  font-size: ${theme.fontSize.xs};
-  color: ${theme.color.sub};
-  cursor: pointer;
-
-  &:hover {
-    color: ${theme.color.danger};
-  }
 `;

@@ -4,6 +4,10 @@ import { useNavigate } from "react-router-dom";
 import { fetchBoardList } from "../../lib/boardApi";
 import { useAuth } from "../../context/AuthContext";
 import BoardItem from "./BoardItem";
+import {
+  isPendingDeletion,
+  subscribePendingDeletion,
+} from "../../lib/pendingDeletion";
 
 import {
   ListContainer,
@@ -46,6 +50,9 @@ const BoardList = ({ boardType }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
 
+  // pendingDeletion 모듈의 mark/unmark가 호출될 때마다 리렌더시키기 위한 트리거
+  const [, forceUpdate] = useState(0);
+
   useEffect(() => {
     let cancelled = false;
     setIsLoading(true);
@@ -70,6 +77,12 @@ const BoardList = ({ boardType }) => {
       cancelled = true;
     };
   }, [boardType, page]);
+
+  // 삭제 대기 상태가 바뀔 때마다(BoardDetail에서 삭제/취소) 리렌더시켜
+  // 아래 렌더 부분의 필터링이 최신 상태를 반영하도록 함
+  useEffect(() => {
+    return subscribePendingDeletion(() => forceUpdate((n) => n + 1));
+  }, []);
 
   // boardType이 바뀌면(탭으로 공지↔문의 이동) 페이지를 1로 리셋
   useEffect(() => {
@@ -160,13 +173,15 @@ const BoardList = ({ boardType }) => {
 
       {!isLoading && !error && boards.length > 0 && (
         <BoardListWrap>
-          {boards.map((board) => (
-            <BoardItem
-              key={board.boardNo}
-              board={board}
-              boardType={boardType}
-            />
-          ))}
+          {boards
+            .filter((board) => !isPendingDeletion(boardType, board.boardNo))
+            .map((board) => (
+              <BoardItem
+                key={board.boardNo}
+                board={board}
+                boardType={boardType}
+              />
+            ))}
         </BoardListWrap>
       )}
 

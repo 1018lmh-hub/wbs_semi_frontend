@@ -2,8 +2,13 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useNavigate, useOutletContext, useParams } from "react-router-dom";
 import { fetchBoardDetail, deleteBoard } from "../../lib/boardApi";
+import {
+  markPendingDeletion,
+  unmarkPendingDeletion,
+} from "../../lib/pendingDeletion";
 import { useAuth } from "../../context/AuthContext";
 import { useToast } from "../../context/ToastContext";
+import CommentList from "./comment/CommentList";
 import {
   DetailContainer,
   HeaderRow,
@@ -108,11 +113,13 @@ const BoardDetail = ({ boardType }) => {
   // 상세보기는 삭제 즉시 목록으로 이동하므로, 별도 pendingIds 화면 필터링 없이
   // "8초 후 실제 DELETE 요청만 보내는" 타이머 하나면 충분함 (목록에서는 삭제 버튼 자체가 없음).
   const handleDeleteClick = () => {
+    markPendingDeletion(boardType, boardNo);
     showToast("게시글이 삭제되었습니다.", "error", {
       duration: UNDO_DURATION,
       actionLabel: "작업취소",
       onAction: () => {
         clearTimeout(deleteTimerRef.current);
+        unmarkPendingDeletion(boardType, boardNo);
       },
     });
 
@@ -124,6 +131,7 @@ const BoardDetail = ({ boardType }) => {
           err.response?.data?.message ?? "게시글 삭제에 실패했습니다.",
           "error",
         );
+        unmarkPendingDeletion(boardType, boardNo);
       }
     }, UNDO_DURATION);
 
@@ -194,7 +202,7 @@ const BoardDetail = ({ boardType }) => {
         </BottomRow>
       )}
 
-      {/* TODO: 문의글 댓글 영역 - 세션 6에서 연결 (boardType === "inquiry"일 때만 렌더) */}
+      {boardType === "inquiry" && <CommentList inquiryNo={boardNo} />}
     </DetailContainer>
   );
 };
