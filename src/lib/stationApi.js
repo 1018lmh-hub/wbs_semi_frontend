@@ -163,3 +163,9 @@ export const deleteBookmark = async (stationNo) => {
   const res = await api.delete(`/stations/${stationNo}/bookmarks`);
   return res.data;
 };
+
+// GET /stations/bookmarks — 본인 즐겨찾기 목록 조회 (stationNo만 내려옴)
+export const fetchBookmarks = async () => {
+  const res = await api.get("/stations/bookmarks");
+  return res.data.data; // [{ bookmarkNo, userId, stationNo, createDate }, ...]
+};

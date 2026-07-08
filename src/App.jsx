@@ -19,6 +19,7 @@ import MyPage from "./features/user/MyPage";
 import MyPageEdit from "./features/user/MyPageEdit";
 import MyPagePassword from "./features/user/MyPagePassword";
 import MyPageWithdraw from "./features/user/MyPageWithdraw";
+import BookmarkList from "./features/bookmark/BookmarkList";
 
 // 화면 레이아웃 및 중첩 라우팅 테스트를 위한 임시(Dummy) 컴포넌트
 const DummyPage = ({ title }) => (
@@ -84,6 +85,7 @@ function App() {
         <Route path="myPage/edit" element={<MyPageEdit />} />
         <Route path="myPage/password" element={<MyPagePassword />} />
         <Route path="myPage/withdraw" element={<MyPageWithdraw />} />
+        <Route path="bookmarks" element={<BookmarkList />} />
 
         {/* 신규 추가: 지도 마커 클릭 시 이동하는 충전소 상세 라우트 */}
         <Route path="stations/:stationId" element={<StationDetail />} />
