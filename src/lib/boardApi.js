@@ -87,3 +87,49 @@ export const fetchBoardDetail = async (boardType, boardNo) => {
     throw err;
   }
 };
+
+/**
+ * 공지사항/문의글 공용 작성.
+ * 프론트 폼 상태 키(title/content)를 boardType별 백엔드 키로 매핑해서 전송.
+ *
+ * @param {"notice"|"inquiry"} boardType
+ * @param {{ title: string, content: string }} formData
+ */
+export const createBoard = async (boardType, { title, content }) => {
+  const config = BOARD_CONFIG[boardType];
+
+  const res = await api.post(config.path, {
+    [config.titleKey]: title,
+    [config.contentKey]: content,
+  });
+  return res.data;
+};
+
+/**
+ * 공지사항/문의글 공용 수정.
+ *
+ * @param {"notice"|"inquiry"} boardType
+ * @param {string|number} boardNo
+ * @param {{ title: string, content: string }} formData
+ */
+export const updateBoard = async (boardType, boardNo, { title, content }) => {
+  const config = BOARD_CONFIG[boardType];
+
+  const res = await api.patch(`${config.path}/${boardNo}`, {
+    [config.titleKey]: title,
+    [config.contentKey]: content,
+  });
+  return res.data;
+};
+/**
+ * 공지사항/문의글 공용 삭제.
+ *
+ * @param {"notice"|"inquiry"} boardType
+ * @param {string|number} boardNo
+ */
+export const deleteBoard = async (boardType, boardNo) => {
+  const config = BOARD_CONFIG[boardType];
+
+  const res = await api.delete(`${config.path}/${boardNo}`);
+  return res.data;
+};

@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { fetchBoardList } from "../../lib/boardApi";
 import { useAuth } from "../../context/AuthContext";
 import BoardItem from "./BoardItem";
+
 import {
   ListContainer,
   TitleRow,

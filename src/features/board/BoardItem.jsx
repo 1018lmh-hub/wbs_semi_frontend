@@ -1,6 +1,7 @@
 // src/features/board/BoardItem.jsx
 import React from "react";
 import { useNavigate } from "react-router-dom";
+
 import {
   ItemContainer,
   TitleBlock,
@@ -9,6 +10,7 @@ import {
   Meta,
   CountText,
   DateText,
+  DeleteButton,
 } from "./BoardItem.style";
 
 const formatDate = (isoString) => (isoString ? isoString.slice(0, 10) : "");
@@ -39,9 +41,7 @@ const BoardItem = ({ board, boardType }) => {
         <Nickname>{board.nickname}</Nickname>
       </TitleBlock>
       <Meta>
-        {/* count 필드가 조회수라는 확실한 명세가 없어 우선 "조회"로 가정 표시함.
-            다른 의미(답변 수 등)라면 라벨만 바꾸면 됨 */}
-        <CountText>조회 {board.count}</CountText>
+        <CountText>조회수 {board.count}</CountText>
         <DateText>{formatDate(board.createDate)}</DateText>
       </Meta>
     </ItemContainer>
