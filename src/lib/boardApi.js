@@ -121,3 +121,15 @@ export const updateBoard = async (boardType, boardNo, { title, content }) => {
   });
   return res.data;
 };
+/**
+ * 공지사항/문의글 공용 삭제.
+ *
+ * @param {"notice"|"inquiry"} boardType
+ * @param {string|number} boardNo
+ */
+export const deleteBoard = async (boardType, boardNo) => {
+  const config = BOARD_CONFIG[boardType];
+
+  const res = await api.delete(`${config.path}/${boardNo}`);
+  return res.data;
+};

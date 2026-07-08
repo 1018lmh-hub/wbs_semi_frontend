@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { fetchBoardList } from "../../lib/boardApi";
 import { useAuth } from "../../context/AuthContext";
 import BoardItem from "./BoardItem";
+import { useBoardDeletion } from "../../context/BoardDeletionContext";
 import {
   ListContainer,
   TitleRow,
@@ -44,6 +45,7 @@ const BoardList = ({ boardType }) => {
   const [page, setPage] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
+  const { requestDelete, isPending } = useBoardDeletion();
 
   useEffect(() => {
     let cancelled = false;
@@ -159,13 +161,16 @@ const BoardList = ({ boardType }) => {
 
       {!isLoading && !error && boards.length > 0 && (
         <BoardListWrap>
-          {boards.map((board) => (
-            <BoardItem
-              key={board.boardNo}
-              board={board}
-              boardType={boardType}
-            />
-          ))}
+          {boards
+            .filter((board) => !isPending(boardType, board.boardNo))
+            .map((board) => (
+              <BoardItem
+                key={board.boardNo}
+                board={board}
+                boardType={boardType}
+                onDeleteClick={(boardNo) => requestDelete(boardType, boardNo)}
+              />
+            ))}
         </BoardListWrap>
       )}
 

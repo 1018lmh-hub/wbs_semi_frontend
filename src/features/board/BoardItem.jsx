@@ -1,6 +1,7 @@
 // src/features/board/BoardItem.jsx
 import React from "react";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../../context/AuthContext";
 import {
   ItemContainer,
   TitleBlock,
@@ -9,6 +10,7 @@ import {
   Meta,
   CountText,
   DateText,
+  DeleteButton,
 } from "./BoardItem.style";
 
 const formatDate = (isoString) => (isoString ? isoString.slice(0, 10) : "");
@@ -25,11 +27,23 @@ const DETAIL_PATH = {
  * 통일된 객체를 받으므로, 여기서는 noticeTitle/inquiryTitle 같은
  * 원본 키를 신경 쓰지 않는다.
  */
-const BoardItem = ({ board, boardType }) => {
+const BoardItem = ({ board, boardType, onDeleteClick }) => {
   const navigate = useNavigate();
+  const { user } = useAuth();
 
   const handleClick = () => {
     navigate(`${DETAIL_PATH[boardType]}/${board.boardNo}`);
+  };
+
+  // role이 "[ROLE_ADMIN]" 형태로 내려오므로 포함 여부로 판별 (BoardDetail과 동일 기준)
+  const isAdmin = !!user?.role?.includes("ROLE_ADMIN");
+  const isOwner = !!user && board.userId === user.userId;
+  // 삭제 노출 조건: 공지는 admin+본인, 문의는 본인만 (BoardDetail의 canManage와 동일 기준)
+  const canDelete = boardType === "notice" ? isAdmin && isOwner : isOwner;
+
+  const handleDeleteClick = (e) => {
+    e.stopPropagation();
+    onDeleteClick?.(board.boardNo);
   };
 
   return (
@@ -39,11 +53,14 @@ const BoardItem = ({ board, boardType }) => {
         <Nickname>{board.nickname}</Nickname>
       </TitleBlock>
       <Meta>
-        {/* count 필드가 조회수라는 확실한 명세가 없어 우선 "조회"로 가정 표시함.
-            다른 의미(답변 수 등)라면 라벨만 바꾸면 됨 */}
-        <CountText>조회 {board.count}</CountText>
+        <CountText>조회수 {board.count}</CountText>
         <DateText>{formatDate(board.createDate)}</DateText>
       </Meta>
+      {canDelete && (
+        <DeleteButton type="button" onClick={handleDeleteClick}>
+          삭제
+        </DeleteButton>
+      )}
     </ItemContainer>
   );
 };

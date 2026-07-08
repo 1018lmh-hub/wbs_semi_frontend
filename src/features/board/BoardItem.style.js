@@ -56,3 +56,17 @@ export const DateText = styled.span`
   font-size: ${theme.fontSize.xs};
   color: ${theme.color.sub};
 `;
+
+export const DeleteButton = styled.button`
+  flex-shrink: 0;
+  background: none;
+  border: none;
+  padding: 2px ${theme.space.xs};
+  font-size: ${theme.fontSize.xs};
+  color: ${theme.color.sub};
+  cursor: pointer;
+
+  &:hover {
+    color: ${theme.color.danger};
+  }
+`;

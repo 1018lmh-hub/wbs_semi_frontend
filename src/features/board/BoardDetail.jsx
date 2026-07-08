@@ -3,6 +3,7 @@ import React, { useEffect, useState } from "react";
 import { useNavigate, useOutletContext, useParams } from "react-router-dom";
 import { fetchBoardDetail } from "../../lib/boardApi";
 import { useAuth } from "../../context/AuthContext";
+import { useBoardDeletion } from "../../context/BoardDeletionContext";
 import {
   DetailContainer,
   HeaderRow,
@@ -46,6 +47,7 @@ const BoardDetail = ({ boardType }) => {
   const navigate = useNavigate();
   const { onCloseOverlay } = useOutletContext() ?? {};
   const { isLoggedIn, user } = useAuth();
+  const { requestDelete } = useBoardDeletion();
 
   const [detail, setDetail] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -97,9 +99,10 @@ const BoardDetail = ({ boardType }) => {
     navigate(`${routeConfig.editPath}/${boardNo}/edit`, { state: detail });
   };
 
-  // 삭제는 세션 5(useBoardDeletion)에서 실제 로직 연결 예정 — 지금은 버튼만 노출
   const handleDeleteClick = () => {
-    console.warn("삭제 기능은 세션 5에서 연결됩니다.");
+    requestDelete(boardType, boardNo);
+    // 상세 화면은 목록이 아니므로 삭제 직후 뒤로 이동 (8초 내 취소해도 목록으로 이동한 상태 유지)
+    handleBack();
   };
 
   // role이 "[ROLE_ADMIN]" 형태로 내려오므로 포함 여부로 판별 (BoardList와 동일 기준)
@@ -127,7 +130,10 @@ const BoardDetail = ({ boardType }) => {
             ← 뒤로
           </BackButton>
         </HeaderRow>
-        <ErrorMessage>게시글 정보를 불러오지 못했습니다.</ErrorMessage>
+        <ErrorMessage>
+          {error?.response?.data?.message ??
+            "게시글 정보를 불러오지 못했습니다."}
+        </ErrorMessage>
       </DetailContainer>
     );
   }
