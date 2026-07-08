@@ -1,7 +1,10 @@
 // src/features/review/ReviewList.jsx
 import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { fetchStationReviewList } from "../../lib/stationApi";
+import {
+  fetchStationReviewList,
+  fetchStationReviewListLatest,
+} from "../../lib/stationApi";
 import { useAuth } from "../../context/AuthContext";
 import ReviewItem from "./ReviewItem";
 import {
@@ -12,6 +15,8 @@ import {
   TitleGroup,
   PageTitle,
   AvgRatingBadge,
+  SortToggleGroup,
+  SortToggleButton,
   ReviewList as ReviewListWrap,
   EmptyMessage,
   LoadingMessage,
@@ -28,16 +33,15 @@ import { useReviewLike } from "./useReviewLike";
  * 후기 전체보기 화면 (/stations/:stationId/reviews)
  * - StationDetail의 "전체보기" 버튼에서 진입
  * - 백엔드에서 5개씩(page당) 내려주는 후기를 pageInfo 기반으로 페이지네이션
- *
- * 스코프 밖(다음 작업 예정):
- * - bookmark(즐겨찾기) 토글
- * - 좋아요(liked) 클릭 인터랙션
+ * - 정렬: 좋아요순(GET /reviews, 기본) / 최신순(GET /reviews/latest) 중 선택
+ *   -> 정렬 기준 자체가 다른 엔드포인트라 sort 변경 시 새로 fetch + page 1로 리셋
  */
 const ReviewList = () => {
   const { stationId } = useParams();
   const navigate = useNavigate();
   const { isLoggedIn } = useAuth();
 
+  const [sort, setSort] = useState("like"); // "like" | "latest"
   const [reviews, setReviews] = useState([]);
   const [avgRating, setAvgRating] = useState(0);
   const [pageInfo, setPageInfo] = useState(null);
@@ -53,8 +57,6 @@ const ReviewList = () => {
     requestDelete(stationId, review.reviewNo);
   };
 
-  // ...기존 useEffect(fetch), handleBack 등 그대로...
-
   useEffect(() => {
     if (!stationId) return;
 
@@ -62,7 +64,10 @@ const ReviewList = () => {
     setIsLoading(true);
     setError(null);
 
-    fetchStationReviewList(stationId, page)
+    const fetcher =
+      sort === "latest" ? fetchStationReviewListLatest : fetchStationReviewList;
+
+    fetcher(stationId, page)
       .then((data) => {
         if (cancelled) return;
         setReviews(data?.reviews ?? []);
@@ -81,7 +86,7 @@ const ReviewList = () => {
     return () => {
       cancelled = true;
     };
-  }, [stationId, page]);
+  }, [stationId, page, sort]);
 
   // 라우트 히스토리 없이 직접 진입한 경우를 대비해 StationDetail 경로로 폴백
   const handleBack = () => {
@@ -94,6 +99,12 @@ const ReviewList = () => {
 
   const handleWriteReview = () => {
     navigate(`/stations/${stationId}/reviews/form`);
+  };
+
+  const handleSortChange = (nextSort) => {
+    if (nextSort === sort) return;
+    setSort(nextSort);
+    setPage(1); // 정렬이 바뀌면 페이지도 처음부터
   };
 
   const handlePageChange = (nextPage) => {
@@ -166,6 +177,24 @@ const ReviewList = () => {
             </WriteReviewButton>
           )}
         </TitleRow>
+
+        {/* 정렬 토글: 좋아요순(기본) / 최신순 - 서로 다른 엔드포인트라 클릭 시 재조회됨 */}
+        <SortToggleGroup>
+          <SortToggleButton
+            type="button"
+            $isActive={sort === "like"}
+            onClick={() => handleSortChange("like")}
+          >
+            좋아요순
+          </SortToggleButton>
+          <SortToggleButton
+            type="button"
+            $isActive={sort === "latest"}
+            onClick={() => handleSortChange("latest")}
+          >
+            최신순
+          </SortToggleButton>
+        </SortToggleGroup>
       </HeaderRow>
 
       {isLoading && <LoadingMessage>후기를 불러오는 중...</LoadingMessage>}
@@ -196,9 +225,6 @@ const ReviewList = () => {
       )}
 
       {renderPagination()}
-
-      {/* TODO: 즐겨찾기 토글 영역 - 즐겨찾기 API 연동 후 구현 (data.bookmark 활용) */}
-      {/* TODO: 좋아요(liked) 클릭 인터랙션 - 관련 API 확정 후 구현 */}
     </ListContainer>
   );
 };

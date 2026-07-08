@@ -169,3 +169,14 @@ export const fetchBookmarks = async () => {
   const res = await api.get("/stations/bookmarks");
   return res.data.data; // [{ bookmarkNo, userId, stationNo, createDate }, ...]
 };
+
+export const fetchStationReviewListLatest = async (stationNo, page = 1) => {
+  try {
+    const res = await api.get(`/stations/${stationNo}/reviews/latest`, {
+      params: { page },
+    });
+    return res.data.data; // { reviews, avgRating, bookmark, pageInfo }
+  } catch (err) {
+    throw err;
+  }
+};
