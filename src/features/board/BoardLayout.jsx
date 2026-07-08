@@ -6,7 +6,6 @@ import {
   BoardTabRow,
   BoardTab,
 } from "./BoardLayout.style";
-import { BoardDeletionProvider } from "../../context/BoardDeletionContext";
 
 /**
  * 공지사항/문의게시판 공통 레이아웃.
@@ -16,19 +15,17 @@ import { BoardDeletionProvider } from "../../context/BoardDeletionContext";
  */
 const BoardLayout = () => {
   return (
-    <BoardDeletionProvider>
-      <BoardLayoutContainer>
-        <BoardTabRow>
-          <BoardTab as={NavLink} to="/notices">
-            공지사항
-          </BoardTab>
-          <BoardTab as={NavLink} to="/inquirys">
-            문의게시판
-          </BoardTab>
-        </BoardTabRow>
-        <Outlet />
-      </BoardLayoutContainer>
-    </BoardDeletionProvider>
+    <BoardLayoutContainer>
+      <BoardTabRow>
+        <BoardTab as={NavLink} to="/notices">
+          공지사항
+        </BoardTab>
+        <BoardTab as={NavLink} to="/inquirys">
+          문의게시판
+        </BoardTab>
+      </BoardTabRow>
+      <Outlet />
+    </BoardLayoutContainer>
   );
 };
 

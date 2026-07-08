@@ -1,9 +1,9 @@
 // src/features/board/BoardDetail.jsx
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useNavigate, useOutletContext, useParams } from "react-router-dom";
-import { fetchBoardDetail } from "../../lib/boardApi";
+import { fetchBoardDetail, deleteBoard } from "../../lib/boardApi";
 import { useAuth } from "../../context/AuthContext";
-import { useBoardDeletion } from "../../context/BoardDeletionContext";
+import { useToast } from "../../context/ToastContext";
 import {
   DetailContainer,
   HeaderRow,
@@ -39,6 +39,10 @@ const formatDate = (isoString) => (isoString ? isoString.slice(0, 10) : "");
  * 댓글 영역은 이번 세션 범위 밖 (세션 6에서 연결 예정) — 자리만 비워둠.
  * 수정/삭제 버튼 클릭 동작은 세션 4(수정), 5(삭제)에서 실제 연결.
  */
+
+// 삭제 취소 가능 시간 (8초) - useReviewDeletion.js와 동일 기준
+const UNDO_DURATION = 8000;
+
 const BoardDetail = ({ boardType }) => {
   const routeConfig = ROUTE_CONFIG[boardType];
   const params = useParams();
@@ -47,11 +51,12 @@ const BoardDetail = ({ boardType }) => {
   const navigate = useNavigate();
   const { onCloseOverlay } = useOutletContext() ?? {};
   const { isLoggedIn, user } = useAuth();
-  const { requestDelete } = useBoardDeletion();
+  const { showToast } = useToast();
 
   const [detail, setDetail] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
+  const deleteTimerRef = useRef(null);
 
   useEffect(() => {
     if (!boardNo) return;
@@ -99,9 +104,29 @@ const BoardDetail = ({ boardType }) => {
     navigate(`${routeConfig.editPath}/${boardNo}/edit`, { state: detail });
   };
 
+  // 삭제 버튼 클릭 시: 서버에 바로 보내지 않고 8초 뒤에 실제 삭제 확정.
+  // 상세보기는 삭제 즉시 목록으로 이동하므로, 별도 pendingIds 화면 필터링 없이
+  // "8초 후 실제 DELETE 요청만 보내는" 타이머 하나면 충분함 (목록에서는 삭제 버튼 자체가 없음).
   const handleDeleteClick = () => {
-    requestDelete(boardType, boardNo);
-    // 상세 화면은 목록이 아니므로 삭제 직후 뒤로 이동 (8초 내 취소해도 목록으로 이동한 상태 유지)
+    showToast("게시글이 삭제되었습니다.", "error", {
+      duration: UNDO_DURATION,
+      actionLabel: "작업취소",
+      onAction: () => {
+        clearTimeout(deleteTimerRef.current);
+      },
+    });
+
+    deleteTimerRef.current = setTimeout(async () => {
+      try {
+        await deleteBoard(boardType, boardNo);
+      } catch (err) {
+        showToast(
+          err.response?.data?.message ?? "게시글 삭제에 실패했습니다.",
+          "error",
+        );
+      }
+    }, UNDO_DURATION);
+
     handleBack();
   };
 
