@@ -27,6 +27,10 @@ const BOARD_CONFIG = {
  * boardType별로 다른 필드명(noticeTitle vs inquiryTitle 등)을
  * 여기서 title/content/boardNo로 통일해서 BoardList/BoardItem에 넘긴다.
  *
+ * hasComment: 문의글 목록에만 내려오는 필드 (답변 등록 여부).
+ * 공지사항 응답엔 이 필드 자체가 없어 자연히 undefined로 매핑되고,
+ * BoardItem에서는 boolean일 때만 뱃지를 렌더하므로 별도 분기 불필요.
+ *
  * @param {"notice"|"inquiry"} boardType
  * @param {number} page
  * @returns {Promise<{ items: Array, pageInfo: object }>}
@@ -48,6 +52,7 @@ export const fetchBoardList = async (boardType, page = 1) => {
       createDate: item.createDate,
       modifyDate: item.modifyDate,
       status: item.status,
+      hasComment: item.hasComment,
     }));
 
     return { items, pageInfo: pageInfo ?? null };
@@ -121,6 +126,7 @@ export const updateBoard = async (boardType, boardNo, { title, content }) => {
   });
   return res.data;
 };
+
 /**
  * 공지사항/문의글 공용 삭제.
  *

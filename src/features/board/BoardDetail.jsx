@@ -4,6 +4,7 @@ import { useNavigate, useOutletContext, useParams } from "react-router-dom";
 import { fetchBoardDetail, deleteBoard } from "../../lib/boardApi";
 import { useAuth } from "../../context/AuthContext";
 import { useToast } from "../../context/ToastContext";
+import CommentList from "./comment/CommentList";
 import {
   DetailContainer,
   HeaderRow,
@@ -194,7 +195,7 @@ const BoardDetail = ({ boardType }) => {
         </BottomRow>
       )}
 
-      {/* TODO: 문의글 댓글 영역 - 세션 6에서 연결 (boardType === "inquiry"일 때만 렌더) */}
+      {boardType === "inquiry" && <CommentList inquiryNo={boardNo} />}
     </DetailContainer>
   );
 };
