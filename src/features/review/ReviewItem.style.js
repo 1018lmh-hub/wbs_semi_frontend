@@ -1,6 +1,12 @@
 // src/features/review/ReviewItem.style.js
-import styled from "styled-components";
+import styled, { keyframes } from "styled-components";
 import { theme } from "../../styles/theme";
+
+const heartBounce = keyframes`
+  0% { transform: scale(1); }
+  40% { transform: scale(1.35); }
+  100% { transform: scale(1); }
+`;
 
 // 카드형으로 통일 (기존 ReviewPreview.style.js의 카드 스타일 기준)
 export const ItemContainer = styled.li`
@@ -48,9 +54,14 @@ export const Title = styled.p`
   `}
 `;
 
-export const Nickname = styled.span`
-  display: block;
+export const NicknameRow = styled.div`
+  display: flex;
+  align-items: center;
+  gap: ${theme.space.xs};
   margin-top: ${theme.space.xs};
+`;
+
+export const Nickname = styled.span`
   font-size: ${theme.fontSize.xs};
   color: ${theme.color.sub};
 `;
@@ -73,7 +84,7 @@ export const LikeButton = styled.button`
   border: none;
   padding: 0;
   font-size: ${theme.fontSize.xs};
-  color: ${({ $liked }) => ($liked ? theme.color.accent : theme.color.sub)};
+  color: ${({ $liked }) => ($liked ? theme.color.danger : theme.color.sub)};
   cursor: pointer;
 
   &:disabled {
@@ -82,7 +93,7 @@ export const LikeButton = styled.button`
   }
 
   &:hover:not(:disabled) {
-    color: ${theme.color.accent};
+    color: ${theme.color.danger};
   }
 `;
 
@@ -139,4 +150,18 @@ export const DeleteButton = styled.button`
   &:hover {
     color: ${theme.color.danger};
   }
+`;
+
+// TitleBlock 아래에 새로 추가
+export const RatingStars = styled.span`
+  font-size: ${theme.fontSize.xs};
+  color: ${theme.color.accent};
+  letter-spacing: 1px;
+`;
+
+export const HeartIcon = styled.span`
+  display: inline-block;
+  font-size: ${theme.fontSize.sm};
+  animation: ${({ $isBouncing }) => ($isBouncing ? heartBounce : "none")} 0.3s
+    ease-in-out;
 `;

@@ -1,5 +1,5 @@
 // src/features/review/ReviewItem.jsx
-import React from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import {
@@ -8,9 +8,12 @@ import {
   ProfileImage,
   TitleBlock,
   Title,
+  NicknameRow,
   Nickname,
+  RatingStars,
   Meta,
   LikeButton,
+  HeartIcon,
   DateText,
   ContentText,
   BottomRow,
@@ -20,6 +23,11 @@ import {
 import { DEFAULT_PROFILE_IMAGE } from "../../lib/defaultProfileImage";
 
 const formatDate = (isoString) => (isoString ? isoString.slice(0, 10) : "");
+
+const renderRatingStars = (rating) => {
+  const filled = Math.max(0, Math.min(5, Math.round(Number(rating) || 0)));
+  return "★".repeat(filled) + "☆".repeat(5 - filled);
+};
 
 /**
  * @param {Function} [onDeleteClick] - 삭제 버튼 클릭 시 호출 (review 전달).
@@ -35,11 +43,14 @@ const ReviewItem = ({
 }) => {
   const navigate = useNavigate();
   const { user, isLoggedIn } = useAuth();
+  const [isBouncing, setIsBouncing] = useState(false); // 하트 바운스 트리거용
 
   const isOwner = !!user && user.userId === review.userId;
 
   const handleLikeClick = () => {
-    if (!isLoggedIn) return; // 버튼은 보이되 비로그인 시 클릭 무시 (disabled 처리와 이중 방어)
+    if (!isLoggedIn) return;
+    setIsBouncing(true);
+    setTimeout(() => setIsBouncing(false), 300); // 애니메이션 길이(0.3s)와 맞춤
     onLikeClick?.(review);
   };
 
@@ -71,7 +82,12 @@ const ReviewItem = ({
         />
         <TitleBlock>
           <Title $variant={variant}>{review.reviewTitle}</Title>
-          <Nickname>{review.nickname}</Nickname>
+          <NicknameRow>
+            <Nickname>{review.nickname}</Nickname>
+            <RatingStars aria-label={`평점 ${review.rating}점`}>
+              {renderRatingStars(review.rating)}
+            </RatingStars>
+          </NicknameRow>
         </TitleBlock>
         <Meta>
           <LikeButton
@@ -81,7 +97,10 @@ const ReviewItem = ({
             $liked={review.liked}
             aria-label={review.liked ? "좋아요 취소" : "좋아요"}
           >
-            👍 {review.likeCount}
+            <HeartIcon $isBouncing={isBouncing}>
+              {review.liked ? "♥" : "♡"}
+            </HeartIcon>
+            {review.likeCount}
           </LikeButton>
           <DateText>{formatDate(review.createDate)}</DateText>
         </Meta>
