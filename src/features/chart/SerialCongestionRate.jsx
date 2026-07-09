@@ -191,7 +191,7 @@ const SerialCongestionRate = () => {
       <SubText>최근 7일 · 시연 배속 적용</SubText>
 
       <ChartArea>
-        <ResponsiveContainer width="100%" height={180}>
+        <ResponsiveContainer width="100%" height={240}>
           <LineChart data={timeline}>
             <CartesianGrid strokeDasharray="3 3" stroke={theme.color.border} />
             <XAxis

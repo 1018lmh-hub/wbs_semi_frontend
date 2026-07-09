@@ -5,6 +5,7 @@ import { theme } from "../../styles/theme";
 export const ListContainer = styled.div`
   display: flex;
   flex-direction: column;
+  flex: 1; /* BoardTabRow를 제외한 남은 공간을 모두 채움 */
   gap: ${theme.space.md};
   padding: ${theme.space.lg};
 `;
@@ -73,7 +74,8 @@ export const PaginationWrap = styled.div`
   justify-content: center;
   align-items: center;
   gap: ${theme.space.xs};
-  margin-top: ${theme.space.sm};
+  margin-top: auto; /* 남은 공간을 모두 밀어내 항상 바닥에 붙도록 함 */
+  padding-top: ${theme.space.sm};
 `;
 
 export const PageArrowButton = styled.button`
