@@ -5,6 +5,10 @@ import { theme } from "../../styles/theme";
 export const ListContainer = styled.div`
   display: flex;
   flex-direction: column;
+  /* 부모(OverlayContent 등)의 퍼센트 높이 체인에 기대지 않고,
+     패널 높이(calc(100vh - headerHeight))와 동일한 기준으로 직접 계산해서
+     하단 여백이 남지 않고 PaginationWrap이 확실히 바닥에 붙도록 함 */
+  min-height: calc(100vh - ${theme.size.headerHeight});
   gap: ${theme.space.md};
   padding: ${theme.space.lg};
 `;
@@ -107,7 +111,8 @@ export const PaginationWrap = styled.div`
   justify-content: center;
   align-items: center;
   gap: ${theme.space.xs};
-  margin-top: ${theme.space.sm};
+  margin-top: auto;
+  padding-top: ${theme.space.sm};
 `;
 
 export const PageArrowButton = styled.button`
