@@ -9,14 +9,13 @@ import {
   LogoImage,
   AuthContainer,
   AuthItem,
+  ChartIconButton,
 } from "./Header.style";
 import logoDark from "../../../assets/plugin-logo-dark.png";
 import { useAuth } from "../../../context/AuthContext";
 
 const Header = ({ toggleSidebar }) => {
   const navigate = useNavigate();
-
-  // 임시값(isLoggedIn = false) 대신 AuthContext의 실제 로그인 상태 사용
   const { isLoggedIn, logout } = useAuth();
 
   const handleNavigation = (path) => {
@@ -24,7 +23,6 @@ const Header = ({ toggleSidebar }) => {
   };
 
   const handleLogout = () => {
-    // AuthContext.logout()이 localStorage 정리 + 전역 로그인 상태 갱신을 함께 처리
     logout();
     navigate("/");
   };
@@ -38,9 +36,28 @@ const Header = ({ toggleSidebar }) => {
       </LeftSection>
 
       <AuthContainer>
-        {/* 게시판 진입 버튼: 로그인/비로그인 상태 상관없이 맨 왼쪽에 고정 노출.
-            항상 공지사항(/notices)으로 진입 — 이후 BoardLayout 탭으로 문의게시판 이동 가능 */}
+        {/* 혼잡도 차트 아이콘: 메뉴 그룹 중 가장 왼쪽에 배치 */}
+        <ChartIconButton
+          onClick={() => handleNavigation("/congestion")}
+          aria-label="실시간 혼잡도 차트 보기"
+        >
+          <svg
+            viewBox="0 0 24 24"
+            width="20"
+            height="20"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <path d="M21.21 15.89A10 10 0 1 1 8 2.83" />
+            <path d="M22 12A10 10 0 0 0 12 2v10z" />
+          </svg>
+        </ChartIconButton>
+
         <AuthItem onClick={() => handleNavigation("/notices")}>게시판</AuthItem>
+
         {isLoggedIn ? (
           <>
             <AuthItem onClick={() => handleNavigation("/myPage")}>
@@ -61,7 +78,6 @@ const Header = ({ toggleSidebar }) => {
             </AuthItem>
           </>
         )}
-        {/* 햄버거 메뉴: 로그인 여부와 무관하게 항상 노출 */}
         <MenuButton onClick={toggleSidebar} aria-label="메뉴 열기">
           ☰
         </MenuButton>

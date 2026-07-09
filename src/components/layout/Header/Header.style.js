@@ -69,3 +69,20 @@ export const AuthItem = styled.div`
     color: ${theme.color.headerText};
   }
 `;
+
+// Header.style.js 하단에 추가
+export const ChartIconButton = styled.button`
+  background: none;
+  border: none;
+  color: ${theme.color.sub};
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  padding: 0;
+  margin-top: 6px;
+  transition: color 0.2s ease-in-out;
+
+  &:hover {
+    color: ${theme.color.accent};
+  }
+`;
