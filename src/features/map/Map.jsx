@@ -47,12 +47,15 @@ function loadNaverMapScript(clientId) {
 
 // ─────────────────────────────────────────────
 // 마커 생성 헬퍼 (충전소 = LOCATION 1개당 마커 1개)
+// onStationSelectRef: 항상 최신 콜백을 가리키는 ref.
+//   부모가 매 렌더마다 새 함수를 넘기더라도 마커를 재생성할 필요가 없도록
+//   effect 의존성 대신 ref로 최신값을 참조한다.
 // ─────────────────────────────────────────────
 function createMarkers(
   stations,
   mapInstance,
   sharedInfoWindow,
-  onStationSelect,
+  onStationSelectRef,
 ) {
   return stations.map((station) => {
     const position = new window.naver.maps.LatLng(station.lat, station.lng);
@@ -79,7 +82,7 @@ function createMarkers(
       );
       sharedInfoWindow.open(mapInstance, marker);
 
-      onStationSelect?.(station);
+      onStationSelectRef.current?.(station);
     });
 
     return marker;
@@ -141,6 +144,15 @@ const Map = ({ onStationSelect, onLocationsLoaded }) => {
   const markersRef = useRef([]);
   const clusterRef = useRef(null);
   const infoWindowRef = useRef(null);
+
+  // 항상 최신 onStationSelect를 가리키는 ref.
+  // 부모(MainLayout)가 라우트 변경 등으로 리렌더되어 매번 새 함수를 넘기더라도
+  // 아래 (C) effect의 의존성 배열에 onStationSelect를 넣지 않음으로써
+  // 마커/클러스터가 불필요하게 재생성(=깜빡임)되는 것을 막는다.
+  const onStationSelectRef = useRef(onStationSelect);
+  useEffect(() => {
+    onStationSelectRef.current = onStationSelect;
+  }, [onStationSelect]);
 
   const [isMapLoaded, setIsMapLoaded] = useState(false);
   const [locations, setLocations] = useState([]); // 충전소 단위로 그룹핑된 배열
@@ -237,6 +249,7 @@ const Map = ({ onStationSelect, onLocationsLoaded }) => {
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   // ── (C) 마커 & 클러스터 렌더링 Effect (locations 변경 시 재실행)
+  // onStationSelect는 의도적으로 의존성에서 제외 — onStationSelectRef로 최신값 참조.
   useEffect(() => {
     if (!isMapLoaded || !mapInstanceRef.current) return;
     if (locations.length === 0) return;
@@ -248,7 +261,7 @@ const Map = ({ onStationSelect, onLocationsLoaded }) => {
       locations,
       mapInstanceRef.current,
       infoWindowRef.current,
-      onStationSelect,
+      onStationSelectRef,
     );
 
     clusterRef.current = initCluster(
@@ -260,7 +273,7 @@ const Map = ({ onStationSelect, onLocationsLoaded }) => {
       cleanupCluster();
       cleanupMarkers();
     };
-  }, [isMapLoaded, locations, onStationSelect]);
+  }, [isMapLoaded, locations]); // eslint-disable-line react-hooks/exhaustive-deps
 
   function cleanupMarkers() {
     markersRef.current.forEach((marker) => {
