@@ -20,6 +20,7 @@ import MyPageEdit from "./features/user/MyPageEdit";
 import MyPagePassword from "./features/user/MyPagePassword";
 import MyPageWithdraw from "./features/user/MyPageWithdraw";
 import BookmarkList from "./features/bookmark/BookmarkList";
+import CongestionPanel from "./features/chart/CongestionPanel";
 
 // 화면 레이아웃 및 중첩 라우팅 테스트를 위한 임시(Dummy) 컴포넌트
 const DummyPage = ({ title }) => (
@@ -43,6 +44,8 @@ function App() {
       <Route element={<MainLayout />}>
         {/* 기본 경로 (/): 오버레이 컨텐츠 없이 지도만 노출 */}
         <Route index element={null} />
+
+        <Route path="congestion" element={<CongestionPanel />} />
 
         {/* 임시 라우트 연결 (URL 변경 시 오버레이 영역에 표출) */}
         <Route path="login" element={<Login />} />
