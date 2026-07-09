@@ -1,90 +1,119 @@
-// src/features/station/ReviewPreview.style.js
+// src/features/station/StationDetail.style.js
 import styled from "styled-components";
 import { theme } from "../../styles/theme";
 
-export const PreviewContainer = styled.section`
-  margin-top: ${theme.space.md};
-  padding-top: ${theme.space.md};
-  border-top: 1px solid ${theme.color.border};
-`;
-
-export const PreviewHeader = styled.div`
+export const DetailContainer = styled.div`
   display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: ${theme.space.sm};
+  flex-direction: column;
+  height: 100%;
+  padding: ${theme.space.sm} ${theme.space.lg} ${theme.space.lg};
 `;
 
 export const TitleRow = styled.div`
   display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: ${theme.space.sm};
+`;
+
+/* stationName과 북마크 별을 같은 줄에 붙여서 배치하기 위한 래퍼 */
+export const StationNameRow = styled.div`
+  display: flex;
   align-items: center;
   gap: ${theme.space.xs};
+  flex: 1;
+  min-width: 0;
+`;
+
+export const CloseButton = styled.button`
+  background: none;
+  border: none;
+  font-size: ${theme.fontSize.lg};
+  color: ${theme.color.sub};
+  cursor: pointer;
+  flex-shrink: 0;
+
+  &:hover {
+    color: ${theme.color.text};
+  }
+`;
+
+export const StationName = styled.h2`
+  flex: 1;
+  min-width: 0;
+  font-size: ${theme.fontSize.xl};
+  color: ${theme.color.text};
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+`;
+
+/* 즐겨찾기 별 - 꽉 찬 별은 accent(청록) 색상으로 강조 */
+export const BookmarkButton = styled.button`
+  flex-shrink: 0;
+  background: none;
+  border: none;
+  padding: 0;
+  font-size: ${theme.fontSize.xl};
+  line-height: 1;
+  cursor: pointer;
+  color: ${({ $bookmarked }) =>
+    $bookmarked ? theme.color.accent : theme.color.sub};
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  &:hover:not(:disabled) {
+    color: ${theme.color.accent};
+  }
+`;
+
+export const StationAddress = styled.p`
+  margin-top: ${theme.space.xs};
+  font-size: ${theme.fontSize.sm};
+  color: ${theme.color.sub};
+`;
+
+export const ChargerListSection = styled.section`
+  margin-top: ${theme.space.md};
 `;
 
 export const SectionTitle = styled.h3`
   font-size: ${theme.fontSize.md};
   color: ${theme.color.text};
+  margin-bottom: ${theme.space.sm};
 `;
 
-export const AvgRatingBadge = styled.span`
-  font-size: ${theme.fontSize.sm};
-  color: ${theme.color.accent};
-  font-weight: bold;
-`;
-
-export const WriteReviewButton = styled.button`
-  flex-shrink: 0;
-  background-color: ${theme.color.primary};
-  color: ${theme.color.headerText};
-  border: none;
-  border-radius: 6px;
-  padding: ${theme.space.xs} ${theme.space.sm};
-  font-size: ${theme.fontSize.xs};
-  cursor: pointer;
-  white-space: nowrap;
-
-  &:hover {
-    background-color: ${theme.color.primarySoft};
-  }
-`;
-
-export const ViewAllButton = styled.button`
-  display: block;
-  width: 100%;
-  margin-top: ${theme.space.sm};
-  background: none;
-  border: 1px solid ${theme.color.border};
-  border-radius: 6px;
-  padding: ${theme.space.sm};
-  font-size: ${theme.fontSize.sm};
-  color: ${theme.color.sub};
-  cursor: pointer;
-
-  &:hover {
-    color: ${theme.color.text};
-    border-color: ${theme.color.sub};
-  }
-`;
-
-export const ReviewList = styled.ul`
+export const ChargerList = styled.ul`
   display: flex;
   flex-direction: column;
   gap: ${theme.space.sm};
 `;
 
-export const EmptyMessage = styled.p`
-  font-size: ${theme.fontSize.sm};
-  color: ${theme.color.sub};
-  text-align: center;
-  padding: ${theme.space.md} 0;
+export const ChargerItem = styled.li`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: ${theme.space.sm};
+  border: 1px solid ${theme.color.border};
+  border-radius: 8px;
+  background-color: ${theme.color.bgSoft};
 `;
 
-export const LoadingMessage = styled.p`
+export const ChargerName = styled.span`
   font-size: ${theme.fontSize.sm};
+  color: ${theme.color.text};
+`;
+
+export const ChargerModeLabel = styled.span`
+  font-size: ${theme.fontSize.xs};
   color: ${theme.color.sub};
 `;
 
-export const ErrorMessage = styled.p`
-  font-size: ${theme.fontSize.sm};
-  color: ${theme.color.danger};
+export const ChargerStatusLabel = styled.span`
+  font-size: ${theme.fontSize.xs};
+  font-weight: bold;
+  color: ${theme.color.sub};
 `;
