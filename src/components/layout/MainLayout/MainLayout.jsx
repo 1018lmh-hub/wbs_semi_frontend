@@ -1,5 +1,5 @@
 // src/components/layout/MainLayout/MainLayout.jsx
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { Outlet, useLocation, useNavigate } from "react-router-dom";
 import Header from "../Header/Header";
 import Map from "../../../features/map/Map";
@@ -56,9 +56,15 @@ const MainLayout = () => {
 
   // Map 마커 클릭 시: 기존 인포윈도우 표시는 Map.jsx 내부에서 그대로 유지되고,
   // 여기서는 추가로 StationDetail 라우트로 이동시키는 역할만 담당
-  const handleStationSelect = (station) => {
-    navigate(`/stations/${station.stationNo}`);
-  };
+  // useCallback으로 감싸서 라우트 변경(리렌더)마다 새 함수가 만들어지지 않게 고정.
+  // navigate의 참조는 안정적이므로 이 함수도 계속 같은 참조를 유지함.
+  // → Map.jsx의 마커 렌더링 useEffect가 불필요하게 재실행(마커 깜빡임)되는 걸 방지.
+  const handleStationSelect = useCallback(
+    (station) => {
+      navigate(`/stations/${station.stationNo}`);
+    },
+    [navigate],
+  );
 
   // 오버레이 닫기 (StationDetail 등에서 사용) — 이전 경로 또는 "/"로 이동
   const handleCloseOverlay = () => {
