@@ -3,21 +3,21 @@ import styled from "styled-components";
 import { theme } from "../../styles/theme";
 
 export const Wrapper = styled.div`
-  padding: ${theme.space.sm} ${theme.space.md}; /* md → sm으로 줄임 (상하 여백) */
+  padding: ${theme.space.md} ${theme.space.lg}; /* 상하좌우 여백 확대 */
   color: ${theme.color.text};
   font-family: "Noto Sans KR", sans-serif;
 `;
 
 export const Title = styled.h2`
-  font-size: ${theme.fontSize.md}; /* lg → md */
+  font-size: ${theme.fontSize.lg}; /* md → lg */
   color: ${theme.color.text};
-  margin: 0 0 4px 0; /* xs → 4px로 더 줄임 */
+  margin: 0 0 ${theme.space.xs} 0;
 `;
 
 export const SubText = styled.p`
-  font-size: ${theme.fontSize.xs}; /* sm → xs */
+  font-size: ${theme.fontSize.sm}; /* xs → sm */
   color: ${theme.color.sub};
-  margin: 0 0 ${theme.space.xs} 0; /* md → xs */
+  margin: 0 0 ${theme.space.sm} 0; /* xs → sm */
 `;
 
 export const ChartArea = styled.div`

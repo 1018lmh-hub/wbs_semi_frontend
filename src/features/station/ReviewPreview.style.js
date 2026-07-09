@@ -3,8 +3,8 @@ import styled from "styled-components";
 import { theme } from "../../styles/theme";
 
 export const PreviewContainer = styled.section`
-  margin-top: ${theme.space.sm};
-  padding-top: ${theme.space.sm};
+  margin-top: ${theme.space.md};
+  padding-top: ${theme.space.md};
   border-top: 1px solid ${theme.color.border};
 `;
 
@@ -12,7 +12,7 @@ export const PreviewHeader = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: ${theme.space.xs};
+  margin-bottom: ${theme.space.sm};
 `;
 
 export const TitleRow = styled.div`
@@ -51,11 +51,11 @@ export const WriteReviewButton = styled.button`
 export const ViewAllButton = styled.button`
   display: block;
   width: 100%;
-  margin-top: ${theme.space.xs};
+  margin-top: ${theme.space.sm};
   background: none;
   border: 1px solid ${theme.color.border};
   border-radius: 6px;
-  padding: ${theme.space.xs};
+  padding: ${theme.space.sm};
   font-size: ${theme.fontSize.sm};
   color: ${theme.color.sub};
   cursor: pointer;
@@ -69,7 +69,7 @@ export const ViewAllButton = styled.button`
 export const ReviewList = styled.ul`
   display: flex;
   flex-direction: column;
-  gap: ${theme.space.xs};
+  gap: ${theme.space.sm};
 `;
 
 export const EmptyMessage = styled.p`

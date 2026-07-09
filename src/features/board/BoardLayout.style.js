@@ -5,7 +5,10 @@ import { theme } from "../../styles/theme";
 export const BoardLayoutContainer = styled.div`
   display: flex;
   flex-direction: column;
-  height: 100%;
+  /* 부모(OverlayContent 등)의 퍼센트 높이 체인에 기대지 않고,
+     패널 높이(calc(100vh - headerHeight))를 직접 계산해서
+     탭 아래 목록 영역이 남은 공간을 확실히 채우도록 함 */
+  min-height: calc(100vh - ${theme.size.headerHeight});
 `;
 
 export const BoardTabRow = styled.div`

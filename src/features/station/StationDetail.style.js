@@ -6,7 +6,7 @@ export const DetailContainer = styled.div`
   display: flex;
   flex-direction: column;
   height: 100%;
-  padding: ${theme.space.sm} ${theme.space.lg} ${theme.space.sm};
+  padding: ${theme.space.sm} ${theme.space.lg} ${theme.space.lg};
 `;
 
 export const TitleRow = styled.div`
@@ -77,26 +77,26 @@ export const StationAddress = styled.p`
 `;
 
 export const ChargerListSection = styled.section`
-  margin-top: ${theme.space.sm};
+  margin-top: ${theme.space.md};
 `;
 
 export const SectionTitle = styled.h3`
   font-size: ${theme.fontSize.md};
   color: ${theme.color.text};
-  margin-bottom: ${theme.space.xs};
+  margin-bottom: ${theme.space.sm};
 `;
 
 export const ChargerList = styled.ul`
   display: flex;
   flex-direction: column;
-  gap: ${theme.space.xs};
+  gap: ${theme.space.sm};
 `;
 
 export const ChargerItem = styled.li`
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: ${theme.space.xs};
+  padding: ${theme.space.sm};
   border: 1px solid ${theme.color.border};
   border-radius: 8px;
   background-color: ${theme.color.bgSoft};

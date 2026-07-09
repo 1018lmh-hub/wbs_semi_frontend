@@ -108,7 +108,7 @@ const CurrentCongestionRate = () => {
       <SubText>전체 {TOTAL_DEVICES}대 기준</SubText>
 
       <ChartArea>
-        <ResponsiveContainer width="100%" height={180}>
+        <ResponsiveContainer width="100%" height={240}>
           <PieChart>
             <Pie
               data={chartData}
@@ -116,8 +116,8 @@ const CurrentCongestionRate = () => {
               nameKey="name"
               cx="50%"
               cy="50%"
-              innerRadius={40}
-              outerRadius={65}
+              innerRadius={52}
+              outerRadius={84}
               paddingAngle={2}
               // label, labelLine 제거 - StatsRow에서 이미 숫자 보여주므로 중복/겹침 방지
             >
@@ -129,7 +129,7 @@ const CurrentCongestionRate = () => {
                 value={`${percent}%`}
                 position="center"
                 fill={theme.color.text}
-                style={{ fontSize: "20px", fontWeight: 700 }}
+                style={{ fontSize: "24px", fontWeight: 700 }}
               />
             </Pie>
             <Tooltip
