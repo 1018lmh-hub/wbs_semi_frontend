@@ -145,15 +145,22 @@ const SignUp = () => {
       showToast("회원가입에 성공했습니다.", "success");
       navigate("/"); // 요청대로 /login 대신 메인화면으로 이동
     } catch (err) {
-      // 실패 시 인라인 에러는 기존 로직 그대로 유지 (토스트는 성공 시에만 사용)
-      const message =
-        err.response?.data?.message ??
-        "회원가입에 실패했습니다. 잠시 후 다시 시도해주세요.";
-      setServerError(message);
+      // (수정) 아이디/닉네임 중복 응답은 data가 null이라 message 텍스트로만 구분 가능.
+      // "아이디" 포함 → 아이디 필드 인라인 에러, "별명" 포함 → 닉네임 필드 인라인 에러.
+      // 그 외(예상 못한 응답)는 기존처럼 공통 에러 박스(serverError)로 표시.
+      const message = err.response?.data?.message;
+
+      if (message?.includes("아이디")) {
+        setFieldErrors((prev) => ({ ...prev, userId: message }));
+      } else if (message?.includes("별명")) {
+        setFieldErrors((prev) => ({ ...prev, nickname: message }));
+      } else {
+        setServerError(
+          message ?? "회원가입에 실패했습니다. 잠시 후 다시 시도해주세요.",
+        );
+      }
     } finally {
-      // (수정) 기존에는 finally가 없어 실패 시 isSubmitting이 계속 true로 남아
-      // 버튼이 "가입 중..." 상태로 멈춰 재요청이 불가능했음.
-      // 성공 시에는 어차피 navigate("/")로 화면을 벗어나므로 여기서 풀어줘도 무방함.
+      // 실패 시에도 항상 isSubmitting을 풀어줘서 재입력 후 재요청이 가능하도록 함
       setIsSubmitting(false);
     }
   };
