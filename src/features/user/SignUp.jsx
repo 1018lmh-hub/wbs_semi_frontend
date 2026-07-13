@@ -1,4 +1,3 @@
-// src/features/user/SignUp.jsx
 import React, { useEffect, useState } from "react";
 import { useNavigate, useOutletContext } from "react-router-dom";
 import api from "../../api/axios";
@@ -21,10 +20,6 @@ import {
   SubmitButton,
 } from "./SignUp.style";
 import { useToast } from "../../context/ToastContext";
-
-// ─────────────────────────────────────────────
-// 클라이언트 측 유효성 검사 규칙 (백엔드 DTO 제약과 동일하게 맞춤)
-// ─────────────────────────────────────────────
 const USER_ID_REGEX = /^[a-zA-Z0-9_]{5,12}$/;
 const USER_PWD_REGEX = /^[a-zA-Z0-9@$!%*#?&]{8,20}$/;
 const NICKNAME_REGEX = /^[a-zA-Z0-9가-힣]{2,10}$/;
@@ -39,20 +34,16 @@ const ALLOWED_PROFILE_TYPES = [
   "image/tiff",
   "image/svg+xml",
 ];
-const MAX_PROFILE_SIZE = 5 * 1024 * 1024; // 5MB
-
+const MAX_PROFILE_SIZE = 5 * 1024 * 1024;
 const INITIAL_FORM = {
   userId: "",
   userPwd: "",
   userPwdConfirm: "",
   nickname: "",
 };
-
 const SignUp = () => {
   const navigate = useNavigate();
-  // MainLayout에서 내려주는 오버레이 닫기 핸들러 (StationDetail 등과 동일 패턴)
   const { onCloseOverlay } = useOutletContext() ?? {};
-
   const [form, setForm] = useState(INITIAL_FORM);
   const [fieldErrors, setFieldErrors] = useState({});
   const [profileFile, setProfileFile] = useState(null);
@@ -61,26 +52,20 @@ const SignUp = () => {
   const [serverError, setServerError] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { showToast } = useToast();
-
-  // 선택한 프로필 이미지 미리보기 URL 정리 (메모리 누수 방지)
   useEffect(() => {
     return () => {
       if (profilePreviewUrl) URL.revokeObjectURL(profilePreviewUrl);
     };
   }, [profilePreviewUrl]);
-
   const handleChange = (e) => {
     const { name, value } = e.target;
     setForm((prev) => ({ ...prev, [name]: value }));
-    // 입력 중에는 해당 필드 에러만 지워서 거슬리지 않게 처리
     setFieldErrors((prev) => ({ ...prev, [name]: null }));
     setServerError(null);
   };
-
   const handleProfileChange = (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
-
     if (!ALLOWED_PROFILE_TYPES.includes(file.type)) {
       setProfileError("지원하지 않는 이미지 형식입니다.");
       return;
@@ -89,16 +74,12 @@ const SignUp = () => {
       setProfileError("이미지 용량은 5MB 이하여야 합니다.");
       return;
     }
-
     setProfileError(null);
     setProfileFile(file);
     setProfilePreviewUrl(URL.createObjectURL(file));
   };
-
-  // 필드별 유효성 검사 (백엔드 정규식 기준과 동일)
   const validate = () => {
     const errors = {};
-
     if (!USER_ID_REGEX.test(form.userId)) {
       errors.userId = "아이디는 5~12자의 영문, 숫자, _만 사용할 수 있습니다.";
     }
@@ -113,43 +94,27 @@ const SignUp = () => {
       errors.nickname =
         "닉네임은 2~10자의 한글, 영문, 숫자만 사용할 수 있습니다.";
     }
-
     setFieldErrors(errors);
     return Object.keys(errors).length === 0;
   };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     setServerError(null);
-
     if (!validate()) return;
-
     setIsSubmitting(true);
-
-    // 백엔드가 @ModelAttribute + @RequestParam(name="file")로 받으므로
-    // multipart/form-data로 전송. Content-Type은 axios가 FormData를 보고
-    // boundary를 포함해 자동으로 설정하므로 직접 지정하지 않음.
     const formData = new FormData();
     formData.append("userId", form.userId);
     formData.append("userPwd", form.userPwd);
     formData.append("nickname", form.nickname);
-    // NOTE: 명세서 예시 표의 key는 "profile"이지만 실제 바인딩은
-    // @RequestParam(name="file")이라 "file"로 전송함. 실제 구현이 다르면
-    // 이 한 줄의 key만 "profile"로 바꾸면 됨.
     if (profileFile) {
       formData.append("file", profileFile);
     }
-
     try {
       await api.post("/users", formData);
       showToast("회원가입에 성공했습니다.", "success");
-      navigate("/"); // 요청대로 /login 대신 메인화면으로 이동
+      navigate("/");
     } catch (err) {
-      // (수정) 아이디/닉네임 중복 응답은 data가 null이라 message 텍스트로만 구분 가능.
-      // "아이디" 포함 → 아이디 필드 인라인 에러, "별명" 포함 → 닉네임 필드 인라인 에러.
-      // 그 외(예상 못한 응답)는 기존처럼 공통 에러 박스(serverError)로 표시.
       const message = err.response?.data?.message;
-
       if (message?.includes("아이디")) {
         setFieldErrors((prev) => ({ ...prev, userId: message }));
       } else if (message?.includes("별명")) {
@@ -160,11 +125,9 @@ const SignUp = () => {
         );
       }
     } finally {
-      // 실패 시에도 항상 isSubmitting을 풀어줘서 재입력 후 재요청이 가능하도록 함
       setIsSubmitting(false);
     }
   };
-
   const handleClose = () => {
     if (onCloseOverlay) {
       onCloseOverlay();
@@ -172,7 +135,6 @@ const SignUp = () => {
       navigate("/");
     }
   };
-
   return (
     <SignUpContainer>
       <HeaderRow>
@@ -180,11 +142,8 @@ const SignUp = () => {
           ✕
         </CloseButton>
       </HeaderRow>
-
       <Title>회원가입</Title>
-
       {serverError && <ServerErrorBox>{serverError}</ServerErrorBox>}
-
       <Form onSubmit={handleSubmit} noValidate>
         <ProfileUploadRow>
           {profilePreviewUrl ? (
@@ -201,7 +160,6 @@ const SignUp = () => {
           />
         </ProfileUploadRow>
         {profileError && <FieldErrorText>{profileError}</FieldErrorText>}
-
         <FieldGroup>
           <Label htmlFor="userId">아이디</Label>
           <Input
@@ -217,7 +175,6 @@ const SignUp = () => {
             <FieldErrorText>{fieldErrors.userId}</FieldErrorText>
           )}
         </FieldGroup>
-
         <FieldGroup>
           <Label htmlFor="userPwd">비밀번호</Label>
           <Input
@@ -234,7 +191,6 @@ const SignUp = () => {
             <FieldErrorText>{fieldErrors.userPwd}</FieldErrorText>
           )}
         </FieldGroup>
-
         <FieldGroup>
           <Label htmlFor="userPwdConfirm">비밀번호 확인</Label>
           <Input
@@ -250,7 +206,6 @@ const SignUp = () => {
             <FieldErrorText>{fieldErrors.userPwdConfirm}</FieldErrorText>
           )}
         </FieldGroup>
-
         <FieldGroup>
           <Label htmlFor="nickname">닉네임</Label>
           <Input
@@ -265,7 +220,6 @@ const SignUp = () => {
             <FieldErrorText>{fieldErrors.nickname}</FieldErrorText>
           )}
         </FieldGroup>
-
         <SubmitButton type="submit" disabled={isSubmitting}>
           {isSubmitting ? "가입 중..." : "회원가입"}
         </SubmitButton>
@@ -273,5 +227,4 @@ const SignUp = () => {
     </SignUpContainer>
   );
 };
-
 export default SignUp;

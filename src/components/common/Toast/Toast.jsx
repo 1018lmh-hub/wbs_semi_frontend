@@ -5,7 +5,6 @@ import {
   ToastActionButton,
   ToastCloseButton,
 } from "./Toast.style";
-
 const Toast = ({
   message,
   type = "success",
@@ -17,7 +16,6 @@ const Toast = ({
     onAction?.();
     onClose();
   };
-
   return (
     <ToastBox $type={type}>
       <ToastMessage>{message}</ToastMessage>
@@ -32,5 +30,4 @@ const Toast = ({
     </ToastBox>
   );
 };
-
 export default Toast;

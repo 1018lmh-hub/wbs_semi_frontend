@@ -1,6 +1,5 @@
 import styled from "styled-components";
 import { theme } from "../../../styles/theme";
-
 export const ToastContainer = styled.div`
   position: fixed;
   bottom: ${theme.space.lg};
@@ -10,7 +9,6 @@ export const ToastContainer = styled.div`
   gap: ${theme.space.sm};
   z-index: 9999;
 `;
-
 export const ToastBox = styled.div`
   display: flex;
   align-items: center;
@@ -23,11 +21,9 @@ export const ToastBox = styled.div`
   color: #fff;
   font-size: ${theme.fontSize.sm};
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-
   background-color: ${({ $type }) =>
     $type === "success" ? theme.color.success : theme.color.danger};
   animation: toast-slide-in 0.25s ease-out;
-
   @keyframes toast-slide-in {
     from {
       opacity: 0;
@@ -39,11 +35,9 @@ export const ToastBox = styled.div`
     }
   }
 `;
-
 export const ToastMessage = styled.p`
   flex: 1;
 `;
-
 export const ToastCloseButton = styled.button`
   background: none;
   border: none;
@@ -51,12 +45,10 @@ export const ToastCloseButton = styled.button`
   font-size: ${theme.fontSize.xs};
   cursor: pointer;
   opacity: 0.8;
-
   &:hover {
     opacity: 1;
   }
 `;
-
 export const ToastActionButton = styled.button`
   flex-shrink: 0;
   background: none;
@@ -68,7 +60,6 @@ export const ToastActionButton = styled.button`
   font-weight: bold;
   cursor: pointer;
   white-space: nowrap;
-
   &:hover {
     background-color: rgba(255, 255, 255, 0.15);
   }

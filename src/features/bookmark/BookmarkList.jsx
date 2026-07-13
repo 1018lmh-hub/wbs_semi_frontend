@@ -1,4 +1,3 @@
-// src/features/bookmark/BookmarkList.jsx
 import React, { useEffect, useState } from "react";
 import { useNavigate, useOutletContext } from "react-router-dom";
 import { fetchBookmarks } from "../../lib/stationApi";
@@ -21,32 +20,21 @@ import {
   PageArrowButton,
   PageNumberButton,
 } from "./BookmarkList.style";
-
-const PAGE_SIZE = 7; // 한 페이지에 보여줄 즐겨찾기 개수
-const BLOCK_SIZE = 5; // 페이지 번호 블록 단위 (ReviewList의 서버 페이징 블록과 동일한 UX)
-
-/**
- * 즐겨찾기 목록 화면 (/bookmarks)
- * - API(GET /stations/bookmarks)가 페이징 없이 전체를 내려주므로,
- *   서버 페이징이 아닌 클라이언트 사이드 페이징으로 7개씩 잘라서 보여준다.
- */
+const PAGE_SIZE = 7;
+const BLOCK_SIZE = 5;
 const BookmarkList = () => {
   const navigate = useNavigate();
   const { locations = [] } = useOutletContext();
-
   const [bookmarks, setBookmarks] = useState([]);
   const [page, setPage] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
-
   const { pendingRemovalIds, removeBookmark } =
     useBookmarkRemoval(setBookmarks);
-
   useEffect(() => {
     let cancelled = false;
     setIsLoading(true);
     setError(null);
-
     fetchBookmarks()
       .then((data) => {
         if (cancelled) return;
@@ -60,30 +48,23 @@ const BookmarkList = () => {
       .finally(() => {
         if (!cancelled) setIsLoading(false);
       });
-
     return () => {
       cancelled = true;
     };
   }, []);
-
   const totalPages = Math.max(1, Math.ceil(bookmarks.length / PAGE_SIZE));
-
-  // 즐겨찾기 해제로 목록이 줄어들어 현재 페이지가 범위를 벗어나면 마지막 페이지로 보정
   useEffect(() => {
     if (page > totalPages) {
       setPage(totalPages);
     }
   }, [page, totalPages]);
-
   const pagedBookmarks = bookmarks.slice(
     (page - 1) * PAGE_SIZE,
     page * PAGE_SIZE,
   );
-
   const currentBlock = Math.ceil(page / BLOCK_SIZE);
   const startPage = (currentBlock - 1) * BLOCK_SIZE + 1;
   const endPage = Math.min(startPage + BLOCK_SIZE - 1, totalPages);
-
   const handleBack = () => {
     if (window.history.length > 1) {
       navigate(-1);
@@ -91,29 +72,23 @@ const BookmarkList = () => {
       navigate("/");
     }
   };
-
   const handleItemClick = (stationNo) => {
     navigate(`/stations/${stationNo}`);
   };
-
   const handleStarClick = (e, bookmark) => {
     e.stopPropagation();
     removeBookmark(bookmark);
   };
-
   const handlePageChange = (nextPage) => {
     if (nextPage < 1 || nextPage > totalPages) return;
     setPage(nextPage);
   };
-
   const renderPagination = () => {
     if (totalPages <= 1) return null;
-
     const pageNumbers = [];
     for (let p = startPage; p <= endPage; p += 1) {
       pageNumbers.push(p);
     }
-
     return (
       <PaginationWrap>
         <PageArrowButton
@@ -124,7 +99,6 @@ const BookmarkList = () => {
         >
           {"<"}
         </PageArrowButton>
-
         {pageNumbers.map((p) => (
           <PageNumberButton
             key={p}
@@ -135,7 +109,6 @@ const BookmarkList = () => {
             {p}
           </PageNumberButton>
         ))}
-
         <PageArrowButton
           type="button"
           disabled={endPage >= totalPages}
@@ -147,7 +120,6 @@ const BookmarkList = () => {
       </PaginationWrap>
     );
   };
-
   return (
     <ListContainer>
       <HeaderRow>
@@ -156,19 +128,15 @@ const BookmarkList = () => {
         </BackButton>
         <PageTitle>즐겨찾기</PageTitle>
       </HeaderRow>
-
       {isLoading && (
         <LoadingMessage>즐겨찾기 목록을 불러오는 중...</LoadingMessage>
       )}
-
       {!isLoading && error && (
         <ErrorMessage>즐겨찾기 목록을 불러오지 못했습니다.</ErrorMessage>
       )}
-
       {!isLoading && !error && bookmarks.length === 0 && (
         <EmptyMessage>즐겨찾기한 충전소가 없습니다.</EmptyMessage>
       )}
-
       {!isLoading && !error && bookmarks.length > 0 && (
         <>
           <BookmarkListWrap>
@@ -177,7 +145,6 @@ const BookmarkList = () => {
                 (loc) => String(loc.stationNo) === String(bookmark.stationNo),
               );
               const isPending = pendingRemovalIds.has(bookmark.bookmarkNo);
-
               return (
                 <BookmarkCard
                   key={bookmark.bookmarkNo}
@@ -191,7 +158,6 @@ const BookmarkList = () => {
                       <StationAddress>{station.address}</StationAddress>
                     )}
                   </StationInfo>
-
                   <BookmarkStarButton
                     type="button"
                     onClick={(e) => handleStarClick(e, bookmark)}
@@ -204,12 +170,10 @@ const BookmarkList = () => {
               );
             })}
           </BookmarkListWrap>
-
           {renderPagination()}
         </>
       )}
     </ListContainer>
   );
 };
-
 export default BookmarkList;

@@ -1,7 +1,5 @@
-// src/features/map/Map.style.js
 import styled from "styled-components";
 import { theme } from "../../styles/theme";
-
 export const MapContainer = styled.div`
   position: fixed;
   top: ${theme.size.headerHeight};
@@ -11,8 +9,6 @@ export const MapContainer = styled.div`
   z-index: 0;
   background-color: ${theme.color.bg};
 `;
-
-/* 지도 로드 전 또는 에러 발생 시 노출되는 인디케이터 */
 export const MapPlaceholder = styled.div`
   width: 100%;
   height: 100%;

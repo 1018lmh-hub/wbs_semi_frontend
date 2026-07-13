@@ -1,5 +1,3 @@
-// src/lib/defaultProfileImage.js
-// 프로필 이미지가 없는 경우 공통으로 사용하는 기본 프로필 (ReviewItem, MyPage 등에서 공유)
 export const DEFAULT_PROFILE_IMAGE =
   "data:image/svg+xml;utf8," +
   encodeURIComponent(

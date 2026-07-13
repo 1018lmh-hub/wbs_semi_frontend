@@ -1,4 +1,3 @@
-// src/features/chart/SerialCongestionRate.jsx
 import React, { useMemo } from "react";
 import {
   LineChart,
@@ -17,15 +16,11 @@ import {
   ChartArea,
   StatusText,
 } from "./SerialCongestionRate.style";
-
 const TOTAL_DEVICES = 100;
-
 const RANGE_MINUTES = 14;
 const BUCKET_INTERVAL_SECONDS = 10;
-
 const TICK_INTERVAL_MINUTES = 2;
 const TICK_INTERVAL_MS = TICK_INTERVAL_MINUTES * 60 * 1000;
-
 const formatTimeLabel = (timestamp) => {
   const d = new Date(timestamp);
   return d.toLocaleTimeString("ko-KR", {
@@ -34,40 +29,29 @@ const formatTimeLabel = (timestamp) => {
     hour12: false,
   });
 };
-
-// asOf: 서버가 이 데이터를 계산한 기준 시각 (문자열/ISO). 브라우저 시계 대신 이걸 "지금"으로 사용.
-// 이렇게 해야 "아직 캐시에 반영 안 된 최근 몇 초 구간"을 그렸다가 나중에 값이 바뀌는 현상이 없어짐.
 const buildTimeline = (logs, asOf) => {
   if (!asOf) return [];
-
   const referenceTime = new Date(asOf).getTime();
   if (Number.isNaN(referenceTime)) return [];
-
   const startTime = referenceTime - RANGE_MINUTES * 60 * 1000;
   const bucketMs = BUCKET_INTERVAL_SECONDS * 1000;
   const bucketCount = Math.floor(
     (RANGE_MINUTES * 60) / BUCKET_INTERVAL_SECONDS,
   );
-
   const events = [];
   logs.forEach((log) => {
     const startMs = new Date(log.createdAt).getTime();
     const endMs = new Date(log.finishAt).getTime();
-
     if (Number.isNaN(startMs) || Number.isNaN(endMs)) return;
-
     events.push({ time: startMs, delta: 1, deviceId: log.deviceId });
     events.push({ time: endMs, delta: -1, deviceId: log.deviceId });
   });
   events.sort((a, b) => a.time - b.time);
-
   const activeCountMap = new Map();
   let eventIdx = 0;
   const points = [];
-
   for (let i = 0; i <= bucketCount; i += 1) {
     const bucketTime = startTime + i * bucketMs;
-
     while (eventIdx < events.length && events[eventIdx].time <= bucketTime) {
       const ev = events[eventIdx];
       const cur = activeCountMap.get(ev.deviceId) || 0;
@@ -76,16 +60,11 @@ const buildTimeline = (logs, asOf) => {
       else activeCountMap.delete(ev.deviceId);
       eventIdx += 1;
     }
-
     const percent = Math.round((activeCountMap.size / TOTAL_DEVICES) * 100);
-
     points.push({ time: bucketTime, percent });
   }
-
   return points;
 };
-
-
 const buildClockAlignedTicks = (start, end) => {
   if (!start || !end) return [];
   const first = Math.ceil(start / TICK_INTERVAL_MS) * TICK_INTERVAL_MS;
@@ -95,17 +74,14 @@ const buildClockAlignedTicks = (start, end) => {
   }
   return ticks;
 };
-
 const SerialCongestionRate = ({ logs, asOf, isLoading, error }) => {
   const timeline = useMemo(() => buildTimeline(logs, asOf), [logs, asOf]);
-
   const tickTimes = useMemo(() => {
     if (timeline.length === 0) return [];
     const start = timeline[0].time;
     const end = timeline[timeline.length - 1].time;
     return buildClockAlignedTicks(start, end);
   }, [timeline]);
-
   if (isLoading) {
     return (
       <Wrapper>
@@ -114,7 +90,6 @@ const SerialCongestionRate = ({ logs, asOf, isLoading, error }) => {
       </Wrapper>
     );
   }
-
   if (error) {
     return (
       <Wrapper>
@@ -123,15 +98,12 @@ const SerialCongestionRate = ({ logs, asOf, isLoading, error }) => {
       </Wrapper>
     );
   }
-
   return (
     <Wrapper>
       <Title>실시간 혼잡도 추이</Title>
-
       <SubText>
         최근 {RANGE_MINUTES}분 · {BUCKET_INTERVAL_SECONDS}초 단위 집계
       </SubText>
-
       <ChartArea>
         <ResponsiveContainer width="100%" height={180}>
           <LineChart data={timeline}>
@@ -180,5 +152,4 @@ const SerialCongestionRate = ({ logs, asOf, isLoading, error }) => {
     </Wrapper>
   );
 };
-
 export default SerialCongestionRate;

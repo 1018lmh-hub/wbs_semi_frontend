@@ -1,4 +1,3 @@
-// src/features/user/MyPagePassword.jsx
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "../../context/ToastContext";
@@ -16,37 +15,27 @@ import {
   FieldErrorText,
   SubmitButton,
 } from "./MyPagePassword.style";
-
-// 백엔드 UpdatePwdRequestDto와 동일한 규칙
 const PWD_REGEX = /^[a-zA-Z0-9@$!%*#?&]{8,20}$/;
-
 const INITIAL_FORM = {
   userPwd: "",
   newPwd: "",
   newPwdConfirm: "",
 };
-
 const MyPagePassword = () => {
   const navigate = useNavigate();
   const { showToast } = useToast();
-
   const [form, setForm] = useState(INITIAL_FORM);
   const [fieldErrors, setFieldErrors] = useState({});
   const [serverError, setServerError] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
-
   const handleChange = (e) => {
     const { name, value } = e.target;
     setForm((prev) => ({ ...prev, [name]: value }));
     setFieldErrors((prev) => ({ ...prev, [name]: null }));
     setServerError(null);
   };
-
-  // 앞단 검증: 형식(백엔드 규칙과 동일) + 새 비밀번호 확인 일치 + 기존/새 비밀번호 동일 여부
-  // (백엔드는 기존과 같은 비밀번호로도 변경을 허용하므로, 여기서 프론트가 막아줌)
   const validate = () => {
     const errors = {};
-
     if (!PWD_REGEX.test(form.userPwd)) {
       errors.userPwd =
         "비밀번호는 8~20자의 영문, 숫자, @$!%*#?& 만 사용할 수 있습니다.";
@@ -61,21 +50,15 @@ const MyPagePassword = () => {
     if (!errors.userPwd && !errors.newPwd && form.userPwd === form.newPwd) {
       errors.newPwd = "새 비밀번호는 기존 비밀번호와 다르게 설정해주세요.";
     }
-
     setFieldErrors(errors);
     return Object.keys(errors).length === 0;
   };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     setServerError(null);
-
     if (!validate()) return;
-
     setIsSubmitting(true);
-
     try {
-      // newPwdConfirm은 프론트 검증 전용, 백엔드로는 userPwd/newPwd 2개만 전송
       await updateUserPwd(form.userPwd, form.newPwd);
       showToast("비밀번호 변경에 성공했습니다.", "success");
       navigate("/myPage");
@@ -88,11 +71,9 @@ const MyPagePassword = () => {
       setIsSubmitting(false);
     }
   };
-
   const handleClose = () => {
     navigate("/myPage");
   };
-
   return (
     <PasswordContainer>
       <HeaderRow>
@@ -100,11 +81,8 @@ const MyPagePassword = () => {
           ✕
         </CloseButton>
       </HeaderRow>
-
       <Title>비밀번호 변경</Title>
-
       {serverError && <ServerErrorBox>{serverError}</ServerErrorBox>}
-
       <Form onSubmit={handleSubmit} noValidate>
         <FieldGroup>
           <Label htmlFor="userPwd">기존 비밀번호</Label>
@@ -121,7 +99,6 @@ const MyPagePassword = () => {
             <FieldErrorText>{fieldErrors.userPwd}</FieldErrorText>
           )}
         </FieldGroup>
-
         <FieldGroup>
           <Label htmlFor="newPwd">새 비밀번호</Label>
           <Input
@@ -138,7 +115,6 @@ const MyPagePassword = () => {
             <FieldErrorText>{fieldErrors.newPwd}</FieldErrorText>
           )}
         </FieldGroup>
-
         <FieldGroup>
           <Label htmlFor="newPwdConfirm">새 비밀번호 확인</Label>
           <Input
@@ -154,7 +130,6 @@ const MyPagePassword = () => {
             <FieldErrorText>{fieldErrors.newPwdConfirm}</FieldErrorText>
           )}
         </FieldGroup>
-
         <SubmitButton type="submit" disabled={isSubmitting}>
           {isSubmitting ? "변경 중..." : "변경하기"}
         </SubmitButton>
@@ -162,5 +137,4 @@ const MyPagePassword = () => {
     </PasswordContainer>
   );
 };
-
 export default MyPagePassword;

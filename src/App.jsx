@@ -1,9 +1,5 @@
-// src/App.jsx
 import React from "react";
-
 import { Routes, Route } from "react-router-dom";
-
-// Layout & Global Components
 import MainLayout from "./components/layout/MainLayout/MainLayout";
 import RequireAuth from "./components/common/RequireAuth/RequireAuth";
 import StationDetail from "./features/station/StationDetail";
@@ -22,8 +18,6 @@ import MyPagePassword from "./features/user/MyPagePassword";
 import MyPageWithdraw from "./features/user/MyPageWithdraw";
 import BookmarkList from "./features/bookmark/BookmarkList";
 import CongestionPanel from "./features/chart/CongestionPanel";
-
-// 화면 레이아웃 및 중첩 라우팅 테스트를 위한 임시(Dummy) 컴포넌트
 const DummyPage = ({ title }) => (
   <div
     style={{
@@ -37,18 +31,14 @@ const DummyPage = ({ title }) => (
     <p>배경의 지도가 리렌더링되지 않고 유지되는지 확인하십시오.</p>
   </div>
 );
-
 function App() {
   return (
     <Routes>
       <Route element={<MainLayout />}>
         <Route index element={null} />
-
         <Route path="congestion" element={<CongestionPanel />} />
-
         <Route path="login" element={<Login />} />
         <Route path="signup" element={<SignUp />} />
-
         <Route element={<BoardLayout />}>
           <Route path="notices" element={<BoardList boardType="notice" />} />
           <Route
@@ -63,7 +53,6 @@ function App() {
             path="notices/:noticeNo/edit"
             element={<BoardForm boardType="notice" />}
           />
-
           <Route path="inquirys" element={<BoardList boardType="inquiry" />} />
           <Route
             path="inquirys/form"
@@ -78,7 +67,6 @@ function App() {
             element={<BoardForm boardType="inquiry" />}
           />
         </Route>
-
         <Route element={<RequireAuth />}>
           <Route path="myPage" element={<MyPage />} />
           <Route path="myPage/edit" element={<MyPageEdit />} />
@@ -86,9 +74,7 @@ function App() {
           <Route path="myPage/withdraw" element={<MyPageWithdraw />} />
           <Route path="bookmarks" element={<BookmarkList />} />
         </Route>
-
         <Route path="stations/:stationId" element={<StationDetail />} />
-
         <Route
           path="stations/:stationId/reviews/form"
           element={<ReviewForm />}
@@ -98,7 +84,6 @@ function App() {
           element={<ReviewForm />}
         />
         <Route path="stations/:stationId/reviews" element={<ReviewList />} />
-
         <Route
           path="*"
           element={<DummyPage title="404 - 찾을 수 없는 페이지" />}
@@ -107,5 +92,4 @@ function App() {
     </Routes>
   );
 }
-
 export default App;

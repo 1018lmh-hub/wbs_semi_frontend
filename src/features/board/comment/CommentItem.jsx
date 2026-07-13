@@ -1,4 +1,3 @@
-// src/features/board/comment/CommentItem.jsx
 import React, { useState } from "react";
 import {
   ItemContainer,
@@ -16,38 +15,27 @@ import {
   CancelButton,
   FieldErrorText,
 } from "./CommentItem.style";
-
 const CONTENT_MAX = 500;
 const formatDate = (isoString) => (isoString ? isoString.slice(0, 10) : "");
-
-/**
- * 댓글 한 건.
- * - 수정: 인라인으로 textarea 전환 (별도 페이지/모달 없이 카드 내부에서 바로 편집)
- * - 삭제: 확인 없이 즉시 요청 (댓글은 8초 지연삭제 대상 아님 - 게시글과 달리 가벼운 액션으로 판단)
- */
 const CommentItem = ({ comment, canManage, onUpdate, onDelete }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [content, setContent] = useState(comment.commentContent);
   const [error, setError] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
-
   const handleEditClick = () => {
     setContent(comment.commentContent);
     setError(null);
     setIsEditing(true);
   };
-
   const handleCancel = () => {
     setIsEditing(false);
     setError(null);
   };
-
   const handleSave = async () => {
     if (content.trim().length < 1 || content.length > CONTENT_MAX) {
       setError(`댓글은 1~${CONTENT_MAX}자 까지 입력가능합니다.`);
       return;
     }
-
     setIsSubmitting(true);
     setError(null);
     try {
@@ -59,11 +47,9 @@ const CommentItem = ({ comment, canManage, onUpdate, onDelete }) => {
       setIsSubmitting(false);
     }
   };
-
   const handleDelete = () => {
     onDelete(comment.commentNo);
   };
-
   if (isEditing) {
     return (
       <ItemContainer>
@@ -95,7 +81,6 @@ const CommentItem = ({ comment, canManage, onUpdate, onDelete }) => {
       </ItemContainer>
     );
   }
-
   return (
     <ItemContainer>
       <TopRow>
@@ -116,5 +101,4 @@ const CommentItem = ({ comment, canManage, onUpdate, onDelete }) => {
     </ItemContainer>
   );
 };
-
 export default CommentItem;

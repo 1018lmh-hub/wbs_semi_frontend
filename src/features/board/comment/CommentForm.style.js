@@ -1,7 +1,5 @@
-// src/features/board/comment/CommentForm.style.js
 import styled from "styled-components";
 import { theme } from "../../../styles/theme";
-
 export const FormWrap = styled.div`
   display: flex;
   flex-direction: column;
@@ -9,7 +7,6 @@ export const FormWrap = styled.div`
   padding-top: ${theme.space.sm};
   border-top: 1px solid ${theme.color.border};
 `;
-
 export const Textarea = styled.textarea`
   min-height: 80px;
   padding: ${theme.space.sm};
@@ -21,14 +18,12 @@ export const Textarea = styled.textarea`
   font-size: ${theme.fontSize.sm};
   resize: vertical;
   font-family: inherit;
-
   &:focus {
     outline: none;
     border-color: ${({ $hasError }) =>
       $hasError ? theme.color.danger : theme.color.primary};
   }
 `;
-
 export const SubmitButton = styled.button`
   align-self: flex-end;
   padding: ${theme.space.xs} ${theme.space.md};
@@ -39,17 +34,14 @@ export const SubmitButton = styled.button`
   font-size: ${theme.fontSize.sm};
   font-weight: bold;
   cursor: pointer;
-
   &:disabled {
     background-color: ${theme.color.border};
     cursor: not-allowed;
   }
-
   &:hover:not(:disabled) {
     background-color: ${theme.color.primarySoft};
   }
 `;
-
 export const FieldErrorText = styled.p`
   font-size: ${theme.fontSize.xs};
   color: ${theme.color.danger};

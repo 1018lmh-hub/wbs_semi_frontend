@@ -1,10 +1,4 @@
-// src/lib/boardApi.js
 import api from "../api/axios";
-
-// boardType별로 실제 엔드포인트/필드명 차이를 여기서 흡수
-// - path: API 경로 (백엔드 표기 그대로, inquiry는 "inquirys")
-// - listKey: 목록 응답에서 배열이 들어있는 필드명
-// - noKey/titleKey/contentKey: 게시글 번호/제목/내용 원본 필드명
 const BOARD_CONFIG = {
   notice: {
     path: "/notices",
@@ -21,27 +15,11 @@ const BOARD_CONFIG = {
     contentKey: "inquiryContent",
   },
 };
-
-/**
- * 공지사항/문의글 공용 목록 조회.
- * boardType별로 다른 필드명(noticeTitle vs inquiryTitle 등)을
- * 여기서 title/content/boardNo로 통일해서 BoardList/BoardItem에 넘긴다.
- *
- * hasComment: 문의글 목록에만 내려오는 필드 (답변 등록 여부).
- * 공지사항 응답엔 이 필드 자체가 없어 자연히 undefined로 매핑되고,
- * BoardItem에서는 boolean일 때만 뱃지를 렌더하므로 별도 분기 불필요.
- *
- * @param {"notice"|"inquiry"} boardType
- * @param {number} page
- * @returns {Promise<{ items: Array, pageInfo: object }>}
- */
 export const fetchBoardList = async (boardType, page = 1) => {
   const config = BOARD_CONFIG[boardType];
-
   try {
     const res = await api.get(config.path, { params: { page } });
     const { [config.listKey]: rawItems, pageInfo } = res.data.data;
-
     const items = (rawItems ?? []).map((item) => ({
       boardNo: item[config.noKey],
       userId: item.userId,
@@ -54,28 +32,16 @@ export const fetchBoardList = async (boardType, page = 1) => {
       status: item.status,
       hasComment: item.hasComment,
     }));
-
     return { items, pageInfo: pageInfo ?? null };
   } catch (err) {
-    // 존재하지 않는 페이지 요청(400) 등은 컴포넌트에서 처리하도록 그대로 던짐
     throw err;
   }
 };
-
-/**
- * 공지사항/문의글 공용 상세 조회.
- * 목록과 동일하게 title/content/boardNo로 필드명을 통일해서 반환한다.
- *
- * @param {"notice"|"inquiry"} boardType
- * @param {string|number} boardNo
- */
 export const fetchBoardDetail = async (boardType, boardNo) => {
   const config = BOARD_CONFIG[boardType];
-
   try {
     const res = await api.get(`${config.path}/${boardNo}`);
     const item = res.data.data;
-
     return {
       boardNo: item[config.noKey],
       userId: item.userId,
@@ -88,54 +54,27 @@ export const fetchBoardDetail = async (boardType, boardNo) => {
       status: item.status,
     };
   } catch (err) {
-    // 존재하지 않는 게시글(400) 등은 컴포넌트에서 처리하도록 그대로 던짐
     throw err;
   }
 };
-
-/**
- * 공지사항/문의글 공용 작성.
- * 프론트 폼 상태 키(title/content)를 boardType별 백엔드 키로 매핑해서 전송.
- *
- * @param {"notice"|"inquiry"} boardType
- * @param {{ title: string, content: string }} formData
- */
 export const createBoard = async (boardType, { title, content }) => {
   const config = BOARD_CONFIG[boardType];
-
   const res = await api.post(config.path, {
     [config.titleKey]: title,
     [config.contentKey]: content,
   });
   return res.data;
 };
-
-/**
- * 공지사항/문의글 공용 수정.
- *
- * @param {"notice"|"inquiry"} boardType
- * @param {string|number} boardNo
- * @param {{ title: string, content: string }} formData
- */
 export const updateBoard = async (boardType, boardNo, { title, content }) => {
   const config = BOARD_CONFIG[boardType];
-
   const res = await api.patch(`${config.path}/${boardNo}`, {
     [config.titleKey]: title,
     [config.contentKey]: content,
   });
   return res.data;
 };
-
-/**
- * 공지사항/문의글 공용 삭제.
- *
- * @param {"notice"|"inquiry"} boardType
- * @param {string|number} boardNo
- */
 export const deleteBoard = async (boardType, boardNo) => {
   const config = BOARD_CONFIG[boardType];
-
   const res = await api.delete(`${config.path}/${boardNo}`);
   return res.data;
 };
