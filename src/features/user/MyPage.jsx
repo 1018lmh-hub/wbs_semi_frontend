@@ -1,7 +1,6 @@
 // src/features/user/MyPage.jsx
 import React, { useEffect, useRef, useState } from "react";
 import { useNavigate, useOutletContext } from "react-router-dom";
-import { useAuth } from "../../context/AuthContext";
 import { useToast } from "../../context/ToastContext";
 import {
   fetchUserProfile,
@@ -45,7 +44,6 @@ const MAX_PROFILE_SIZE = 5 * 1024 * 1024; // 5MB
 const MyPage = () => {
   const navigate = useNavigate();
   const { onCloseOverlay } = useOutletContext() ?? {};
-  const { isLoggedIn } = useAuth();
   const { showToast } = useToast();
   const fileInputRef = useRef(null);
 
@@ -54,13 +52,8 @@ const MyPage = () => {
   const [error, setError] = useState(null);
   const [isUploading, setIsUploading] = useState(false);
 
-  useEffect(() => {
-    if (!isLoggedIn) {
-      showToast("로그인이 필요합니다.", "error");
-      navigate("/login", { replace: true });
-    }
-  }, [isLoggedIn, navigate, showToast]);
-
+  // 로그인 여부 체크는 App.jsx의 RequireAuth가 라우트 단위로 처리하므로
+  // 이 컴포넌트는 로그인된 상태로만 렌더링된다고 가정하고 바로 데이터를 불러옴.
   const loadProfile = async () => {
     try {
       setIsLoading(true);
@@ -78,10 +71,9 @@ const MyPage = () => {
   };
 
   useEffect(() => {
-    if (!isLoggedIn) return;
     loadProfile();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isLoggedIn]);
+  }, []);
 
   // 프로필 이미지 클릭 → 숨겨진 파일 input 트리거
   const handleProfileClick = () => {
@@ -148,8 +140,6 @@ const MyPage = () => {
     }
   };
 
-  if (!isLoggedIn) return null;
-
   return (
     <MyPageContainer>
       <HeaderRow>
@@ -200,7 +190,6 @@ const MyPage = () => {
             </UserInfoBlock>
           </ProfileSection>
 
-          {/* TODO: 비밀번호 변경 / 회원탈퇴는 다음 작업에서 순차적으로 연결 예정 */}
           <MenuList>
             <MenuButton type="button" onClick={() => navigate("/myPage/edit")}>
               회원정보 수정

@@ -1,5 +1,5 @@
 // src/features/user/Login.jsx
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate, useOutletContext } from "react-router-dom";
 import api from "../../api/axios";
 import {
@@ -36,6 +36,18 @@ const Login = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { showToast } = useToast();
   const { login } = useAuth();
+
+  // 리프레시 토큰 만료로 인한 강제 로그아웃 후 진입한 경우, 만료 안내 토스트 표시
+  // (axios.js 응답 인터셉터가 sessionStorage에 남겨둔 플래그를 여기서 확인 후 즉시 제거)
+  useEffect(() => {
+    if (sessionStorage.getItem("authExpired")) {
+      sessionStorage.removeItem("authExpired");
+      showToast(
+        "로그인 기간이 만료되었습니다. 다시 로그인을 시도해주세요.",
+        "error",
+      );
+    }
+  }, [showToast]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;

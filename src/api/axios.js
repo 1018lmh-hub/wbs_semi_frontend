@@ -24,7 +24,7 @@ api.interceptors.response.use(
     // 이 정보를 가지고 있어야 우리가 실패한 요청 URL로 다시 요청을 보낼 수 있음
 
     const { config: original, response } = err;
-    // console.log(original);
+    //console.log(original);
     // console.log(response);
 
     // 401이 아니면 걍 에러 반환
@@ -32,7 +32,9 @@ api.interceptors.response.use(
       return Promise.reject(err);
     }
     // 만료가 아닌 401이 오면 빠이빠이
-    const isExpired = String(response.data).includes("토큰만료");
+    const isExpired = String(response.data.message).includes(
+      "만료된 토큰입니다.",
+    );
     if (!isExpired || original._retry) {
       return Promise.reject(err);
     }
@@ -58,10 +60,14 @@ api.interceptors.response.use(
         localStorage.removeItem(k),
       );
 
+      // 전체 새로고침(window.location.href)으로 이동하면 현재 React 트리(ToastProvider 포함)가
+      // 모두 사라지므로, 여기서 직접 토스트를 띄울 수 없음.
+      // 대신 세션에 플래그만 남기고, /login 페이지가 마운트될 때 그 플래그를 읽어서 토스트를 띄움.
+      sessionStorage.setItem("authExpired", "1");
+
       if (window.location.pathname !== "/login") {
         window.location.href = "/login";
       }
-
       return Promise.reject(e);
     }
   },

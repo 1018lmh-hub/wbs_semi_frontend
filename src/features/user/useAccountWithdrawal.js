@@ -25,10 +25,8 @@ export function useAccountWithdrawal() {
       timerRef.current = null;
       try {
         await deleteUser(userPwd);
-        // 서버 탈퇴 성공 시점에만 로그아웃 확정 (localStorage 정리 + 로그인 상태 해제)
-        logout();
+        await logout();
       } catch (err) {
-        // 실패(비밀번호 불일치 등) 시 이미 메인으로 이동한 상태이므로 토스트로만 안내
         showToast(
           err.response?.data?.message ?? "회원탈퇴에 실패했습니다.",
           "error",
