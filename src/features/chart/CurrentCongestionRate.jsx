@@ -1,5 +1,5 @@
 // src/features/chart/CurrentCongestionRate.jsx
-import React, { useEffect, useState, useCallback, useMemo } from "react";
+import React, { useMemo } from "react";
 import {
   PieChart,
   Pie,
@@ -10,7 +10,6 @@ import {
   ResponsiveContainer,
 } from "recharts";
 import { theme } from "../../styles/theme";
-import { fetchCurrentCongestion } from "../../lib/raspApi";
 import {
   Wrapper,
   Title,
@@ -26,47 +25,13 @@ import {
 // 전체 라즈베리파이 대수 (고정값 - 추후 대수 변경 시 이 값만 수정)
 const TOTAL_DEVICES = 100;
 
-// 실시간 반영을 위한 폴링 주기 (ms)
-// 발표용 60배율 시연 시에도 "지금이 구간 안에 있는지"만 비교하는 로직이라
-// 별도 수정 없이 그대로 동작함
-const POLL_INTERVAL = 10000;
-
-const CurrentCongestionRate = () => {
-  const [logs, setLogs] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState(null);
-
-  const loadData = useCallback(async () => {
-    try {
-      const data = await fetchCurrentCongestion();
-      setLogs(data);
-      setError(null);
-    } catch (e) {
-      setError("혼잡도 정보를 불러오지 못했습니다.");
-    } finally {
-      setIsLoading(false);
-    }
-  }, []);
-
-  useEffect(() => {
-    loadData();
-    const timer = setInterval(loadData, POLL_INTERVAL);
-    return () => clearInterval(timer);
-  }, [loadData]);
-
-  // deviceId가 여러 로그(중복 사용 이력)를 가질 수 있으므로,
-  // "지금 이 순간 사용중인 로그가 하나라도 있는 deviceId"만 Set으로 모아 중복 집계를 방지
+const CurrentCongestionRate = ({ logs, isLoading, error }) => {
+  // 백엔드 findCurrent()가 이미 "그 순간 활성인 세션"만 정확히 필터링해서 줌.
+  // 클라이언트에서 now와 다시 비교하면, 캐시 지연 + 짧은 세션(최소 3초) 때문에
+  // 이미 끝난 세션까지 걸러내며 혼잡도가 실제보다 낮게(심하면 0으로) 잘못 계산됨.
+  // 따라서 여기서는 deviceId 중복 제거만 하고, 시간 재검증은 하지 않음.
   const { inUseCount, idleCount, percent } = useMemo(() => {
-    const now = new Date();
-    const activeDeviceIds = new Set();
-
-    logs.forEach((log) => {
-      const start = new Date(log.createdAt);
-      const end = new Date(log.finishAt);
-      if (now >= start && now <= end) {
-        activeDeviceIds.add(log.deviceId);
-      }
-    });
+    const activeDeviceIds = new Set(logs.map((log) => log.deviceId));
 
     const inUse = activeDeviceIds.size;
     const idle = Math.max(TOTAL_DEVICES - inUse, 0);
@@ -119,12 +84,10 @@ const CurrentCongestionRate = () => {
               innerRadius={52}
               outerRadius={84}
               paddingAngle={2}
-              // label, labelLine 제거 - StatsRow에서 이미 숫자 보여주므로 중복/겹침 방지
             >
               {chartData.map((entry, index) => (
                 <Cell key={entry.name} fill={COLORS[index]} />
               ))}
-              {/* 도넛 가운데에 혼잡도 % 표시 */}
               <Label
                 value={`${percent}%`}
                 position="center"
@@ -146,7 +109,20 @@ const CurrentCongestionRate = () => {
         </ResponsiveContainer>
       </ChartArea>
 
-      <StatsRow>{/* 기존 그대로 */}</StatsRow>
+      <StatsRow>
+        <StatBox>
+          <StatLabel>사용중</StatLabel>
+          <StatValue $color={theme.color.danger}>{inUseCount}대</StatValue>
+        </StatBox>
+        <StatBox>
+          <StatLabel>미사용</StatLabel>
+          <StatValue $color={theme.color.success}>{idleCount}대</StatValue>
+        </StatBox>
+        <StatBox>
+          <StatLabel>혼잡도</StatLabel>
+          <StatValue $color={theme.color.accent}>{percent}%</StatValue>
+        </StatBox>
+      </StatsRow>
     </Wrapper>
   );
 };

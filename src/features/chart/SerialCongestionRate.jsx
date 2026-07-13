@@ -1,5 +1,5 @@
 // src/features/chart/SerialCongestionRate.jsx
-import React, { useEffect, useState, useCallback, useMemo } from "react";
+import React, { useMemo } from "react";
 import {
   LineChart,
   Line,
@@ -10,7 +10,6 @@ import {
   ResponsiveContainer,
 } from "recharts";
 import { theme } from "../../styles/theme";
-import { fetchSerialCongestion } from "../../lib/raspApi";
 import {
   Wrapper,
   Title,
@@ -21,13 +20,11 @@ import {
 
 const TOTAL_DEVICES = 100;
 
-// 최근 14분, 10초 단위로 집계
 const RANGE_MINUTES = 14;
 const BUCKET_INTERVAL_SECONDS = 10;
 
-// X축 눈금: 2분 간격 (10분/2분 = 5개 눈금)
 const TICK_INTERVAL_MINUTES = 2;
-const BUCKETS_PER_TICK = (TICK_INTERVAL_MINUTES * 60) / BUCKET_INTERVAL_SECONDS;
+const TICK_INTERVAL_MS = TICK_INTERVAL_MINUTES * 60 * 1000;
 
 const formatTimeLabel = (timestamp) => {
   const d = new Date(timestamp);
@@ -38,9 +35,15 @@ const formatTimeLabel = (timestamp) => {
   });
 };
 
-const buildTimeline = (logs) => {
-  const now = new Date();
-  const startTime = now.getTime() - RANGE_MINUTES * 60 * 1000;
+// asOf: 서버가 이 데이터를 계산한 기준 시각 (문자열/ISO). 브라우저 시계 대신 이걸 "지금"으로 사용.
+// 이렇게 해야 "아직 캐시에 반영 안 된 최근 몇 초 구간"을 그렸다가 나중에 값이 바뀌는 현상이 없어짐.
+const buildTimeline = (logs, asOf) => {
+  if (!asOf) return [];
+
+  const referenceTime = new Date(asOf).getTime();
+  if (Number.isNaN(referenceTime)) return [];
+
+  const startTime = referenceTime - RANGE_MINUTES * 60 * 1000;
   const bucketMs = BUCKET_INTERVAL_SECONDS * 1000;
   const bucketCount = Math.floor(
     (RANGE_MINUTES * 60) / BUCKET_INTERVAL_SECONDS,
@@ -48,16 +51,13 @@ const buildTimeline = (logs) => {
 
   const events = [];
   logs.forEach((log) => {
-    events.push({
-      time: new Date(log.createdAt).getTime(),
-      delta: 1,
-      deviceId: log.deviceId,
-    });
-    events.push({
-      time: new Date(log.finishAt).getTime(),
-      delta: -1,
-      deviceId: log.deviceId,
-    });
+    const startMs = new Date(log.createdAt).getTime();
+    const endMs = new Date(log.finishAt).getTime();
+
+    if (Number.isNaN(startMs) || Number.isNaN(endMs)) return;
+
+    events.push({ time: startMs, delta: 1, deviceId: log.deviceId });
+    events.push({ time: endMs, delta: -1, deviceId: log.deviceId });
   });
   events.sort((a, b) => a.time - b.time);
 
@@ -78,42 +78,31 @@ const buildTimeline = (logs) => {
     }
 
     const percent = Math.round((activeCountMap.size / TOTAL_DEVICES) * 100);
-    const isTick = i % BUCKETS_PER_TICK === 0;
-
-    points.push({ time: bucketTime, isTick, percent });
+    points.push({ time: bucketTime, percent });
   }
 
   return points;
 };
 
-const SerialCongestionRate = () => {
-  const [timeline, setTimeline] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState(null);
+const buildClockAlignedTicks = (start, end) => {
+  if (!start || !end) return [];
+  const first = Math.ceil(start / TICK_INTERVAL_MS) * TICK_INTERVAL_MS;
+  const ticks = [];
+  for (let t = first; t <= end; t += TICK_INTERVAL_MS) {
+    ticks.push(t);
+  }
+  return ticks;
+};
 
-  const loadData = useCallback(async () => {
-    try {
-      const logs = await fetchSerialCongestion();
-      setTimeline(buildTimeline(logs));
-      setError(null);
-    } catch (e) {
-      console.error("[SerialCongestionRate] fetch/build error:", e);
-      setError("혼잡도 추이 정보를 불러오지 못했습니다.");
-    } finally {
-      setIsLoading(false);
-    }
-  }, []);
+const SerialCongestionRate = ({ logs, asOf, isLoading, error }) => {
+  const timeline = useMemo(() => buildTimeline(logs, asOf), [logs, asOf]);
 
-  useEffect(() => {
-    loadData();
-    const timer = setInterval(loadData, 10000);
-    return () => clearInterval(timer);
-  }, [loadData]);
-
-  const tickTimes = useMemo(
-    () => timeline.filter((p) => p.isTick).map((p) => p.time),
-    [timeline],
-  );
+  const tickTimes = useMemo(() => {
+    if (timeline.length === 0) return [];
+    const start = timeline[0].time;
+    const end = timeline[timeline.length - 1].time;
+    return buildClockAlignedTicks(start, end);
+  }, [timeline]);
 
   if (isLoading) {
     return (
@@ -136,7 +125,10 @@ const SerialCongestionRate = () => {
   return (
     <Wrapper>
       <Title>실시간 혼잡도 추이</Title>
-      <SubText>최근 10분 · 10초 단위 집계</SubText>
+
+      <SubText>
+        최근 {RANGE_MINUTES}분 · {BUCKET_INTERVAL_SECONDS}초 단위 집계
+      </SubText>
 
       <ChartArea>
         <ResponsiveContainer width="100%" height={180}>
