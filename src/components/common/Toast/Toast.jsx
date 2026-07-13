@@ -1,4 +1,3 @@
-// src/components/common/Toast/Toast.jsx
 import React from "react";
 import {
   ToastBox,
@@ -14,8 +13,6 @@ const Toast = ({
   onAction,
   onClose,
 }) => {
-  // 액션 버튼 클릭 시: 등록된 취소 로직 실행 + 토스트도 즉시 닫음
-  // (X 버튼은 취소가 아니라 단순히 토스트만 닫는 것 — 8초 타이머는 계속 진행됨)
   const handleActionClick = () => {
     onAction?.();
     onClose();

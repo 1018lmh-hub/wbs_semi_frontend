@@ -1,4 +1,3 @@
-// src/features/board/BoardDetail.jsx
 import React, { useEffect, useRef, useState } from "react";
 import { useNavigate, useOutletContext, useParams } from "react-router-dom";
 import { fetchBoardDetail, deleteBoard } from "../../lib/boardApi";
@@ -27,7 +26,6 @@ import {
   ErrorMessage,
 } from "./BoardDetail.style";
 
-// boardType별 라우트 파라미터명/경로 prefix (App.jsx 라우트 정의와 짝을 맞춤)
 const ROUTE_CONFIG = {
   notice: { paramName: "noticeNo", listPath: "/notices", editPath: "/notices" },
   inquiry: {
@@ -39,13 +37,6 @@ const ROUTE_CONFIG = {
 
 const formatDate = (isoString) => (isoString ? isoString.slice(0, 10) : "");
 
-/**
- * 공지사항/문의글 공용 상세보기.
- * 댓글 영역은 이번 세션 범위 밖 (세션 6에서 연결 예정) — 자리만 비워둠.
- * 수정/삭제 버튼 클릭 동작은 세션 4(수정), 5(삭제)에서 실제 연결.
- */
-
-// 삭제 취소 가능 시간 (8초) - useReviewDeletion.js와 동일 기준
 const UNDO_DURATION = 8000;
 
 const BoardDetail = ({ boardType }) => {
@@ -109,9 +100,6 @@ const BoardDetail = ({ boardType }) => {
     navigate(`${routeConfig.editPath}/${boardNo}/edit`, { state: detail });
   };
 
-  // 삭제 버튼 클릭 시: 서버에 바로 보내지 않고 8초 뒤에 실제 삭제 확정.
-  // 상세보기는 삭제 즉시 목록으로 이동하므로, 별도 pendingIds 화면 필터링 없이
-  // "8초 후 실제 DELETE 요청만 보내는" 타이머 하나면 충분함 (목록에서는 삭제 버튼 자체가 없음).
   const handleDeleteClick = () => {
     markPendingDeletion(boardType, boardNo);
     showToast("게시글이 삭제되었습니다.", "error", {
@@ -138,7 +126,6 @@ const BoardDetail = ({ boardType }) => {
     handleBack();
   };
 
-  // role이 "[ROLE_ADMIN]" 형태로 내려오므로 포함 여부로 판별 (BoardList와 동일 기준)
   const isAdmin = !!user?.role?.includes("ROLE_ADMIN");
   const isOwner = !!user && detail?.userId === user.userId;
 

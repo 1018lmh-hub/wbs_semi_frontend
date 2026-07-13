@@ -10,13 +10,6 @@ export const LayoutContainer = styled.div`
   background-color: ${theme.color.bg};
 `;
 
-/**
- * 기존 왼쪽 고정 SidebarContainer(400px, left: 0, translateX(-100%))는 제거.
- * 오른쪽에서 슬라이드되는 통합 오버레이로 전환.
- * - 위치: right: 0
- * - 너비: 지도 화면의 40% (40vw)
- * - 기본 상태: 닫힘 (라우트 매칭 시에만 $isOpen=true)
- */
 export const OverlayContainer = styled.aside`
   position: absolute;
   top: ${theme.size.headerHeight};
@@ -42,7 +35,6 @@ export const OverlayContent = styled.div`
   font-family: "Noto Sans KR", sans-serif;
   box-sizing: border-box;
 
-  /* 스크롤바 커스텀 (다크테마 매칭) */
   &::-webkit-scrollbar {
     width: 6px;
   }
