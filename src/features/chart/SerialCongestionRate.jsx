@@ -25,9 +25,9 @@ const TOTAL_DEVICES = 100;
 const RANGE_MINUTES = 14;
 const BUCKET_INTERVAL_SECONDS = 10;
 
-// X축 눈금: 2분 간격 (10분/2분 = 5개 눈금)
+// X축 눈금: 시계 기준 2분 간격 (예: 14:32:00, 14:34:00...)
 const TICK_INTERVAL_MINUTES = 2;
-const BUCKETS_PER_TICK = (TICK_INTERVAL_MINUTES * 60) / BUCKET_INTERVAL_SECONDS;
+const TICK_INTERVAL_MS = TICK_INTERVAL_MINUTES * 60 * 1000;
 
 const formatTimeLabel = (timestamp) => {
   const d = new Date(timestamp);
@@ -78,12 +78,23 @@ const buildTimeline = (logs) => {
     }
 
     const percent = Math.round((activeCountMap.size / TOTAL_DEVICES) * 100);
-    const isTick = i % BUCKETS_PER_TICK === 0;
 
-    points.push({ time: bucketTime, isTick, percent });
+    points.push({ time: bucketTime, percent });
   }
 
   return points;
+};
+
+// 주어진 [start, end] 구간 안에서, 시계 기준 TICK_INTERVAL_MS의 배수가 되는
+// 시각들만 뽑아서 눈금으로 사용 (예: 14:32:00, 14:34:00, 14:36:00 ...)
+const buildClockAlignedTicks = (start, end) => {
+  if (!start || !end) return [];
+  const first = Math.ceil(start / TICK_INTERVAL_MS) * TICK_INTERVAL_MS;
+  const ticks = [];
+  for (let t = first; t <= end; t += TICK_INTERVAL_MS) {
+    ticks.push(t);
+  }
+  return ticks;
 };
 
 const SerialCongestionRate = () => {
@@ -110,10 +121,12 @@ const SerialCongestionRate = () => {
     return () => clearInterval(timer);
   }, [loadData]);
 
-  const tickTimes = useMemo(
-    () => timeline.filter((p) => p.isTick).map((p) => p.time),
-    [timeline],
-  );
+  const tickTimes = useMemo(() => {
+    if (timeline.length === 0) return [];
+    const start = timeline[0].time;
+    const end = timeline[timeline.length - 1].time;
+    return buildClockAlignedTicks(start, end);
+  }, [timeline]);
 
   if (isLoading) {
     return (
