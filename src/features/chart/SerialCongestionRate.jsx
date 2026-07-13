@@ -78,11 +78,13 @@ const buildTimeline = (logs, asOf) => {
     }
 
     const percent = Math.round((activeCountMap.size / TOTAL_DEVICES) * 100);
+
     points.push({ time: bucketTime, percent });
   }
 
   return points;
 };
+
 
 const buildClockAlignedTicks = (start, end) => {
   if (!start || !end) return [];
