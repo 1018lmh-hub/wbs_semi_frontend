@@ -1,5 +1,6 @@
 // src/context/AuthContext.jsx
 import React, { createContext, useCallback, useContext, useState } from "react";
+import api from "../api/axios";
 
 const AuthContext = createContext(null);
 
@@ -7,7 +8,7 @@ const STORAGE_KEYS = {
   token: "token",
   refreshToken: "refreshToken",
   userId: "userId",
-  nickname: "nickname", // memberName → nickname으로 통일 (review.nickname 등과 이름 맞춤)
+  nickname: "nickname",
   role: "role",
 };
 
@@ -25,7 +26,6 @@ const getStoredUser = () => {
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(getStoredUser);
 
-  // data: { userId, nickname, accessToken, refreshToken, role }
   const login = useCallback((data) => {
     localStorage.setItem(STORAGE_KEYS.token, data.accessToken);
     localStorage.setItem(STORAGE_KEYS.refreshToken, data.refreshToken);
@@ -40,19 +40,36 @@ export const AuthProvider = ({ children }) => {
     });
   }, []);
 
-  const logout = useCallback(() => {
+  // (변경) DB에 저장된 리프레시 토큰도 함께 삭제하도록 서버 요청 추가.
+  // 서버 요청이 실패하더라도(네트워크 오류, 이미 만료된 토큰 등) 클라이언트 로그아웃은
+  // 반드시 진행되어야 하므로 try/catch로 감싸고, localStorage 정리 + 상태 초기화는
+  // 요청 성공 여부와 무관하게 항상 실행함.
+  const logout = useCallback(async () => {
+    const refreshToken = localStorage.getItem(STORAGE_KEYS.refreshToken);
+
+    if (refreshToken) {
+      try {
+        // 백엔드 컨트롤러가 @RequestBody String refreshToken 을 받으므로
+        // 순수 문자열을 JSON으로 직접 보내야 함 (axios가 문자열은 자동 stringify 하지 않음)
+        await api.post("/auth/logout", JSON.stringify(refreshToken), {
+          headers: { "Content-Type": "application/json" },
+        });
+      } catch (err) {
+        console.error("서버 로그아웃 요청 실패:", err);
+      }
+    }
+
     Object.values(STORAGE_KEYS).forEach((key) => localStorage.removeItem(key));
     setUser(null);
   }, []);
 
-  // 마이페이지 닉네임 수정 성공 시 호출: localStorage + 전역 상태 동시 갱신
   const updateNickname = useCallback((newNickname) => {
     localStorage.setItem(STORAGE_KEYS.nickname, newNickname);
     setUser((prev) => (prev ? { ...prev, nickname: newNickname } : prev));
   }, []);
 
   const value = {
-    user, // { userId, nickname, role } | null
+    user,
     isLoggedIn: !!user,
     login,
     logout,

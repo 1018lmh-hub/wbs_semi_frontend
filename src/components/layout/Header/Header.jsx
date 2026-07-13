@@ -22,8 +22,8 @@ const Header = ({ toggleSidebar }) => {
     navigate(path);
   };
 
-  const handleLogout = () => {
-    logout();
+  const handleLogout = async () => {
+    await logout();
     navigate("/");
   };
 

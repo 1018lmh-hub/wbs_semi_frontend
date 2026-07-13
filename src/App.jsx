@@ -5,6 +5,7 @@ import { Routes, Route } from "react-router-dom";
 
 // Layout & Global Components
 import MainLayout from "./components/layout/MainLayout/MainLayout";
+import RequireAuth from "./components/common/RequireAuth/RequireAuth";
 import StationDetail from "./features/station/StationDetail";
 import ReviewForm from "./features/review/ReviewForm";
 import SignUp from "./features/user/SignUp";
@@ -84,11 +85,16 @@ function App() {
           />
         </Route>
 
-        <Route path="myPage" element={<MyPage />} />
-        <Route path="myPage/edit" element={<MyPageEdit />} />
-        <Route path="myPage/password" element={<MyPagePassword />} />
-        <Route path="myPage/withdraw" element={<MyPageWithdraw />} />
-        <Route path="bookmarks" element={<BookmarkList />} />
+        {/* 마이페이지 계열: RequireAuth로 묶어서 비로그인 시 URL 직접 접근을 차단.
+            (기존에는 MyPage.jsx에만 개별 체크가 있어 edit/password/withdraw는
+            URL로 바로 진입 가능한 취약점이 있었음) */}
+        <Route element={<RequireAuth />}>
+          <Route path="myPage" element={<MyPage />} />
+          <Route path="myPage/edit" element={<MyPageEdit />} />
+          <Route path="myPage/password" element={<MyPagePassword />} />
+          <Route path="myPage/withdraw" element={<MyPageWithdraw />} />
+          <Route path="bookmarks" element={<BookmarkList />} />
+        </Route>
 
         {/* 신규 추가: 지도 마커 클릭 시 이동하는 충전소 상세 라우트 */}
         <Route path="stations/:stationId" element={<StationDetail />} />

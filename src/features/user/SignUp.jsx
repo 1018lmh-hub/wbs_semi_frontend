@@ -150,6 +150,11 @@ const SignUp = () => {
         err.response?.data?.message ??
         "회원가입에 실패했습니다. 잠시 후 다시 시도해주세요.";
       setServerError(message);
+    } finally {
+      // (수정) 기존에는 finally가 없어 실패 시 isSubmitting이 계속 true로 남아
+      // 버튼이 "가입 중..." 상태로 멈춰 재요청이 불가능했음.
+      // 성공 시에는 어차피 navigate("/")로 화면을 벗어나므로 여기서 풀어줘도 무방함.
+      setIsSubmitting(false);
     }
   };
 

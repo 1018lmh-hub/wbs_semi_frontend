@@ -127,28 +127,3 @@ export const SubmitButton = styled.button`
     background-color: ${theme.color.primarySoft};
   }
 `;
-
-export const AuthGuardBox = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: ${theme.space.sm};
-  padding: ${theme.space.xl} 0;
-  color: ${theme.color.sub};
-  font-size: ${theme.fontSize.sm};
-  text-align: center;
-`;
-
-export const AuthGuardButton = styled.button`
-  padding: ${theme.space.xs} ${theme.space.md};
-  border: none;
-  border-radius: 6px;
-  background-color: ${theme.color.primary};
-  color: #fff;
-  font-size: ${theme.fontSize.sm};
-  cursor: pointer;
-
-  &:hover {
-    background-color: ${theme.color.primarySoft};
-  }
-`;

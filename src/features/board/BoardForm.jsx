@@ -23,8 +23,6 @@ import {
   CharCount,
   FieldErrorText,
   SubmitButton,
-  AuthGuardBox,
-  AuthGuardButton,
 } from "./BoardForm.style";
 
 const TITLE_MAX = 100;
@@ -57,9 +55,15 @@ const mapServerFieldErrors = (data, boardType) => {
  *
  * 접근 권한:
  * - 공지 작성: 로그인 + ROLE_ADMIN
- * - 공지 수정: 로그인 + ROLE_ADMIN + 본인 작성 글 (세션 3에서 정한 기준과 일치)
+ * - 공지 수정: 로그인 + ROLE_ADMIN + 본인 작성 글
  * - 문의 작성: 로그인
  * - 문의 수정: 로그인 + 본인 작성 글
+ *
+ * (변경) 작성/수정 모드를 불문하고, 권한이 없는 경우(비로그인, 관리자 아님, 본인 글 아님)는
+ * 더 이상 인라인 안내 박스를 보여주지 않고, 즉시 메인("/")으로 리다이렉트 +
+ * "권한이 없는 접근입니다." 토스트로 통일함.
+ * (단, 수정 모드에서 location.state 자체가 없는 경우는 "권한" 문제가 아니라
+ * "잘못된 접근"이므로 기존처럼 목록으로 보내는 별도 처리를 그대로 유지함)
  */
 const BoardForm = ({ boardType }) => {
   const routeConfig = ROUTE_CONFIG[boardType];
@@ -89,7 +93,33 @@ const BoardForm = ({ boardType }) => {
   const [serverError, setServerError] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // location.state 없이 새로고침/직접 URL 접근한 경우 목록으로 리다이렉트 (ReviewForm과 동일)
+  const isAdmin = !!user?.role?.includes("ROLE_ADMIN");
+  const isOwner = !!user && isEditMode && editData?.userId === user.userId;
+
+  // 작성(생성) 모드 권한 체크
+  // - 공지 작성: 로그인 + ROLE_ADMIN 필요
+  // - 문의 작성: 로그인만 필요
+  const isWriteUnauthorized =
+    !isEditMode && (!isLoggedIn || (boardType === "notice" && !isAdmin));
+
+  // 수정 모드 권한 체크 (editData가 있는 경우에만 판단 가능)
+  // - 공지 수정: 로그인 + ROLE_ADMIN + 본인 글
+  // - 문의 수정: 로그인 + 본인 글
+  const isEditUnauthorized = isEditMode && !!editData && !isOwner;
+
+  const isUnauthorized = isWriteUnauthorized || isEditUnauthorized;
+
+  // 권한 없음 → 폼이 잠깐이라도 보이지 않도록 즉시 메인으로 리다이렉트 + 토스트
+  useEffect(() => {
+    if (isUnauthorized) {
+      showToast("권한이 없는 접근입니다.", "error");
+      navigate("/", { replace: true });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isUnauthorized]);
+
+  // location.state 없이 새로고침/직접 URL 접근한 경우 목록으로 리다이렉트 (ReviewForm과 동일, 수정 모드 전용)
+  // 권한 문제가 아니라 "필요한 데이터 자체가 없는" 경우라 위 권한 체크와는 분리해서 처리함
   useEffect(() => {
     if (isEditMode && !editData) {
       showToast("잘못된 접근입니다. 목록에서 다시 시도해주세요.", "error");
@@ -178,44 +208,8 @@ const BoardForm = ({ boardType }) => {
     }
   };
 
-  // 접근 권한 체크
-  // - 공지: 로그인 + ROLE_ADMIN 필요. 수정 모드면 추가로 본인 작성 글이어야 함
-  // - 문의: 로그인 필요. 수정 모드면 추가로 본인 작성 글이어야 함
-  const isAdmin = !!user?.role?.includes("ROLE_ADMIN");
-  const isOwner = !!user && isEditMode && editData?.userId === user.userId;
-
-  const hasAccess = (() => {
-    if (!isLoggedIn) return false;
-    if (boardType === "notice") {
-      return isEditMode ? isAdmin && isOwner : isAdmin;
-    }
-    return isEditMode ? isOwner : true;
-  })();
-
-  // 비로그인이거나 권한이 없는 경우 폼 대신 안내만 표시 (ReviewForm의 비로그인 안내 패턴과 동일)
-  if (!isLoggedIn || (isEditMode && editData && !hasAccess)) {
-    return (
-      <FormContainer>
-        <HeaderRow>
-          <CloseButton onClick={handleClose} aria-label="닫기">
-            ✕
-          </CloseButton>
-        </HeaderRow>
-        <AuthGuardBox>
-          <p>
-            {!isLoggedIn
-              ? `게시글 ${isEditMode ? "수정" : "작성"}은 로그인 후 이용할 수 있습니다.`
-              : "이 게시글을 수정할 권한이 없습니다."}
-          </p>
-          {!isLoggedIn && (
-            <AuthGuardButton type="button" onClick={() => navigate("/login")}>
-              로그인하러 가기
-            </AuthGuardButton>
-          )}
-        </AuthGuardBox>
-      </FormContainer>
-    );
-  }
+  // 권한 없음(작성/수정 공통) → 리다이렉트되는 동안 아무것도 그리지 않음
+  if (isUnauthorized) return null;
 
   // editData가 없어 리다이렉트되는 순간까지의 짧은 깜빡임 방지
   if (isEditMode && !editData) return null;
