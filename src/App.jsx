@@ -41,19 +41,14 @@ const DummyPage = ({ title }) => (
 function App() {
   return (
     <Routes>
-      {/* 부모 라우트: Header와 Map을 포함하는 전역 레이아웃 */}
       <Route element={<MainLayout />}>
-        {/* 기본 경로 (/): 오버레이 컨텐츠 없이 지도만 노출 */}
         <Route index element={null} />
 
         <Route path="congestion" element={<CongestionPanel />} />
 
-        {/* 임시 라우트 연결 (URL 변경 시 오버레이 영역에 표출) */}
         <Route path="login" element={<Login />} />
         <Route path="signup" element={<SignUp />} />
 
-        {/* 공지사항 / 문의게시판: 상단 탭(BoardLayout)으로 서로 이동 가능하게 중첩 라우팅
-            "게시판" 헤더 버튼은 항상 이 그룹의 기본 진입점인 /notices로 이동 */}
         <Route element={<BoardLayout />}>
           <Route path="notices" element={<BoardList boardType="notice" />} />
           <Route
@@ -69,7 +64,6 @@ function App() {
             element={<BoardForm boardType="notice" />}
           />
 
-          {/* 백엔드 표기 "inquirys"에 맞춰 경로 통일, 표시 텍스트는 한글 유지 */}
           <Route path="inquirys" element={<BoardList boardType="inquiry" />} />
           <Route
             path="inquirys/form"
@@ -85,9 +79,6 @@ function App() {
           />
         </Route>
 
-        {/* 마이페이지 계열: RequireAuth로 묶어서 비로그인 시 URL 직접 접근을 차단.
-            (기존에는 MyPage.jsx에만 개별 체크가 있어 edit/password/withdraw는
-            URL로 바로 진입 가능한 취약점이 있었음) */}
         <Route element={<RequireAuth />}>
           <Route path="myPage" element={<MyPage />} />
           <Route path="myPage/edit" element={<MyPageEdit />} />
@@ -96,9 +87,8 @@ function App() {
           <Route path="bookmarks" element={<BookmarkList />} />
         </Route>
 
-        {/* 신규 추가: 지도 마커 클릭 시 이동하는 충전소 상세 라우트 */}
         <Route path="stations/:stationId" element={<StationDetail />} />
-        {/* 신규 추가: StationDetail/후기 전체보기의 "후기 작성" 버튼에서 이동 */}
+
         <Route
           path="stations/:stationId/reviews/form"
           element={<ReviewForm />}
@@ -109,7 +99,6 @@ function App() {
         />
         <Route path="stations/:stationId/reviews" element={<ReviewList />} />
 
-        {/* 404 라우트 */}
         <Route
           path="*"
           element={<DummyPage title="404 - 찾을 수 없는 페이지" />}

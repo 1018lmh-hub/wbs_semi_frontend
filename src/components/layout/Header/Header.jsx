@@ -36,7 +36,6 @@ const Header = ({ toggleSidebar }) => {
       </LeftSection>
 
       <AuthContainer>
-        {/* 혼잡도 차트 아이콘: 메뉴 그룹 중 가장 왼쪽에 배치 */}
         <ChartIconButton
           onClick={() => handleNavigation("/congestion")}
           aria-label="실시간 혼잡도 차트 보기"
