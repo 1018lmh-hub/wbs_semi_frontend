@@ -1,4 +1,3 @@
-// src/features/station/ReviewPreview.jsx
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
@@ -18,13 +17,6 @@ import {
 } from "./ReviewPreview.style";
 import { useReviewDeletion } from "../review/useReviewDeletion";
 import { useReviewLike } from "../review/useReviewLike";
-
-/**
- * StationDetail 하단에 표시되는 후기 미리보기 영역.
- * - (변경) 데이터 fetch는 더 이상 이 컴포넌트가 하지 않음.
- *   북마크 별과 같은 API(GET /stations/{stationNo})를 사용하기 때문에
- *   StationDetail이 한 번만 호출하고 reviews/avgRating/isLoading/error/setReviews를 내려줌.
- */
 const ReviewPreview = ({
   stationNo,
   reviews,
@@ -37,18 +29,14 @@ const ReviewPreview = ({
 }) => {
   const navigate = useNavigate();
   const { isLoggedIn } = useAuth();
-
   const { pendingIds, requestDelete } = useReviewDeletion(setReviews);
   const { pendingLikeIds, toggleLike } = useReviewLike(setReviews);
-
   const handleDeleteClick = (review) => {
     requestDelete(stationNo, review.reviewNo);
   };
-
   const handleLikeClick = (review) => {
     toggleLike(stationNo, review);
   };
-
   const handleViewAll = () => {
     if (onViewAllClick) {
       onViewAllClick();
@@ -56,11 +44,9 @@ const ReviewPreview = ({
     }
     navigate(`/stations/${stationNo}/reviews`);
   };
-
   const handleWriteReview = () => {
     navigate(`/stations/${stationNo}/reviews/form`);
   };
-
   if (isLoading) {
     return (
       <PreviewContainer>
@@ -68,7 +54,6 @@ const ReviewPreview = ({
       </PreviewContainer>
     );
   }
-
   if (error) {
     return (
       <PreviewContainer>
@@ -76,11 +61,9 @@ const ReviewPreview = ({
       </PreviewContainer>
     );
   }
-
   const previewReviews = reviews
     .filter((review) => !pendingIds.has(review.reviewNo))
     .slice(0, maxPreviewCount);
-
   return (
     <PreviewContainer>
       <PreviewHeader>
@@ -96,7 +79,6 @@ const ReviewPreview = ({
           </WriteReviewButton>
         )}
       </PreviewHeader>
-
       {previewReviews.length === 0 ? (
         <EmptyMessage>아직 등록된 후기가 없습니다.</EmptyMessage>
       ) : (
@@ -113,10 +95,8 @@ const ReviewPreview = ({
           ))}
         </ReviewList>
       )}
-
       <ViewAllButton onClick={handleViewAll}>전체보기</ViewAllButton>
     </PreviewContainer>
   );
 };
-
 export default ReviewPreview;

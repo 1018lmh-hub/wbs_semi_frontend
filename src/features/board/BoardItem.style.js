@@ -1,7 +1,5 @@
-// src/features/board/BoardItem.style.js
 import styled from "styled-components";
 import { theme } from "../../styles/theme";
-
 export const ItemContainer = styled.li`
   display: flex;
   align-items: center;
@@ -12,24 +10,20 @@ export const ItemContainer = styled.li`
   background-color: ${theme.color.bgSoft};
   border: 1px solid ${theme.color.border};
   cursor: pointer;
-
   &:hover {
     border-color: ${theme.color.accent};
   }
 `;
-
 export const TitleBlock = styled.div`
   flex: 1;
   min-width: 0;
 `;
-
 export const TitleRow = styled.div`
   display: flex;
   align-items: center;
   gap: ${theme.space.xs};
   min-width: 0;
 `;
-
 export const Title = styled.p`
   font-size: ${theme.fontSize.sm};
   font-weight: bold;
@@ -39,8 +33,6 @@ export const Title = styled.p`
   text-overflow: ellipsis;
   min-width: 0;
 `;
-
-// 문의글 답변 등록 여부 뱃지 (hasComment === true일 때만 렌더)
 export const AnsweredBadge = styled.span`
   flex-shrink: 0;
   font-size: ${theme.fontSize.xs};
@@ -51,14 +43,12 @@ export const AnsweredBadge = styled.span`
   padding: 1px ${theme.space.xs};
   white-space: nowrap;
 `;
-
 export const Nickname = styled.span`
   display: block;
   margin-top: ${theme.space.xs};
   font-size: ${theme.fontSize.xs};
   color: ${theme.color.sub};
 `;
-
 export const Meta = styled.div`
   display: flex;
   flex-direction: column;
@@ -66,12 +56,10 @@ export const Meta = styled.div`
   gap: 2px;
   flex-shrink: 0;
 `;
-
 export const CountText = styled.span`
   font-size: ${theme.fontSize.xs};
   color: ${theme.color.sub};
 `;
-
 export const DateText = styled.span`
   font-size: ${theme.fontSize.xs};
   color: ${theme.color.sub};

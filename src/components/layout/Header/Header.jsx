@@ -1,4 +1,3 @@
-// src/components/layout/Header/Header.jsx
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import {
@@ -13,20 +12,16 @@ import {
 } from "./Header.style";
 import logoDark from "../../../assets/plugin-logo-dark.png";
 import { useAuth } from "../../../context/AuthContext";
-
 const Header = ({ toggleSidebar }) => {
   const navigate = useNavigate();
   const { isLoggedIn, logout } = useAuth();
-
   const handleNavigation = (path) => {
     navigate(path);
   };
-
   const handleLogout = async () => {
     await logout();
     navigate("/");
   };
-
   return (
     <HeaderContainer>
       <LeftSection>
@@ -34,7 +29,6 @@ const Header = ({ toggleSidebar }) => {
           <LogoImage src={logoDark} alt="Plug-in Logo" />
         </LogoWrapper>
       </LeftSection>
-
       <AuthContainer>
         <ChartIconButton
           onClick={() => handleNavigation("/congestion")}
@@ -54,9 +48,7 @@ const Header = ({ toggleSidebar }) => {
             <path d="M22 12A10 10 0 0 0 12 2v10z" />
           </svg>
         </ChartIconButton>
-
         <AuthItem onClick={() => handleNavigation("/notices")}>게시판</AuthItem>
-
         {isLoggedIn ? (
           <>
             <AuthItem onClick={() => handleNavigation("/myPage")}>
@@ -84,5 +76,4 @@ const Header = ({ toggleSidebar }) => {
     </HeaderContainer>
   );
 };
-
 export default Header;

@@ -1,7 +1,5 @@
-// src/components/layout/Header/Header.style.js
 import styled from "styled-components";
 import { theme } from "../../../styles/theme";
-
 export const HeaderContainer = styled.header`
   position: fixed;
   top: 0;
@@ -16,13 +14,11 @@ export const HeaderContainer = styled.header`
   z-index: 1000;
   box-sizing: border-box;
 `;
-
 export const LeftSection = styled.div`
   display: flex;
   align-items: center;
   gap: ${theme.space.md};
 `;
-
 export const MenuButton = styled.button`
   background: none;
   border: none;
@@ -33,30 +29,25 @@ export const MenuButton = styled.button`
   align-items: center;
   padding: 0;
   transition: color 0.2s ease-in-out;
-
   &:hover {
     color: ${theme.color.accent};
   }
 `;
-
 export const LogoWrapper = styled.div`
   cursor: pointer;
   display: flex;
   align-items: center;
 `;
-
 export const LogoImage = styled.img`
   height: 32px;
   width: auto;
   display: block;
   margin-top: 6px;
 `;
-
 export const AuthContainer = styled.div`
   display: flex;
   gap: ${theme.space.md};
 `;
-
 export const AuthItem = styled.div`
   margin-top: 7px;
   color: ${theme.color.sub};
@@ -64,13 +55,10 @@ export const AuthItem = styled.div`
   font-size: ${theme.fontSize.sm};
   cursor: pointer;
   transition: color 0.2s ease-in-out;
-
   &:hover {
     color: ${theme.color.headerText};
   }
 `;
-
-// Header.style.js 하단에 추가
 export const ChartIconButton = styled.button`
   background: none;
   border: none;
@@ -81,7 +69,6 @@ export const ChartIconButton = styled.button`
   padding: 0;
   margin-top: 6px;
   transition: color 0.2s ease-in-out;
-
   &:hover {
     color: ${theme.color.accent};
   }

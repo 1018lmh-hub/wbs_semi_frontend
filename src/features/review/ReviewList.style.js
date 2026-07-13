@@ -1,24 +1,17 @@
-// src/features/review/ReviewList.style.js
 import styled from "styled-components";
 import { theme } from "../../styles/theme";
-
 export const ListContainer = styled.div`
   display: flex;
   flex-direction: column;
-  /* 부모(OverlayContent 등)의 퍼센트 높이 체인에 기대지 않고,
-     패널 높이(calc(100vh - headerHeight))와 동일한 기준으로 직접 계산해서
-     하단 여백이 남지 않고 PaginationWrap이 확실히 바닥에 붙도록 함 */
   min-height: calc(100vh - ${theme.size.headerHeight});
   gap: ${theme.space.md};
   padding: ${theme.space.lg};
 `;
-
 export const HeaderRow = styled.div`
   display: flex;
   flex-direction: column;
   gap: ${theme.space.sm};
 `;
-
 export const BackButton = styled.button`
   align-self: flex-start;
   background: none;
@@ -27,31 +20,26 @@ export const BackButton = styled.button`
   font-size: ${theme.fontSize.sm};
   cursor: pointer;
   padding: 0;
-
   &:hover {
     color: ${theme.color.text};
   }
 `;
-
 export const TitleRow = styled.div`
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: ${theme.space.sm};
 `;
-
 export const TitleGroup = styled.div`
   display: flex;
   align-items: center;
   gap: ${theme.space.sm};
 `;
-
 export const PageTitle = styled.h2`
   font-size: ${theme.fontSize.lg};
   color: ${theme.color.text};
   margin: 0;
 `;
-
 export const AvgRatingBadge = styled.span`
   font-size: ${theme.fontSize.sm};
   color: ${theme.color.accent};
@@ -59,7 +47,6 @@ export const AvgRatingBadge = styled.span`
   border-radius: 12px;
   padding: 2px ${theme.space.sm};
 `;
-
 export const ReviewList = styled.ul`
   list-style: none;
   margin: 0;
@@ -68,28 +55,24 @@ export const ReviewList = styled.ul`
   flex-direction: column;
   gap: ${theme.space.md};
 `;
-
 export const EmptyMessage = styled.p`
   color: ${theme.color.sub};
   font-size: ${theme.fontSize.sm};
   text-align: center;
   padding: ${theme.space.lg} 0;
 `;
-
 export const LoadingMessage = styled.p`
   color: ${theme.color.sub};
   font-size: ${theme.fontSize.sm};
   text-align: center;
   padding: ${theme.space.lg} 0;
 `;
-
 export const ErrorMessage = styled.p`
   color: ${theme.color.danger};
   font-size: ${theme.fontSize.sm};
   text-align: center;
   padding: ${theme.space.lg} 0;
 `;
-
 export const WriteReviewButton = styled.button`
   flex-shrink: 0;
   background-color: ${theme.color.primary};
@@ -100,12 +83,10 @@ export const WriteReviewButton = styled.button`
   font-size: ${theme.fontSize.xs};
   cursor: pointer;
   white-space: nowrap;
-
   &:hover {
     background-color: ${theme.color.primarySoft};
   }
 `;
-
 export const PaginationWrap = styled.div`
   display: flex;
   justify-content: center;
@@ -114,7 +95,6 @@ export const PaginationWrap = styled.div`
   margin-top: auto;
   padding-top: ${theme.space.sm};
 `;
-
 export const PageArrowButton = styled.button`
   background: none;
   border: 1px solid ${theme.color.border};
@@ -123,13 +103,11 @@ export const PageArrowButton = styled.button`
   width: 28px;
   height: 28px;
   cursor: pointer;
-
   &:disabled {
     color: ${theme.color.border};
     cursor: not-allowed;
   }
 `;
-
 export const PageNumberButton = styled.button`
   background-color: ${({ $isActive }) =>
     $isActive ? theme.color.primary : "transparent"};
@@ -141,18 +119,15 @@ export const PageNumberButton = styled.button`
   height: 28px;
   font-size: ${theme.fontSize.xs};
   cursor: pointer;
-
   &:hover {
     background-color: ${({ $isActive }) =>
       $isActive ? theme.color.primary : theme.color.bgSoft};
   }
 `;
-
 export const SortToggleGroup = styled.div`
   display: flex;
   gap: ${theme.space.xs};
 `;
-
 export const SortToggleButton = styled.button`
   background-color: ${({ $isActive }) =>
     $isActive ? theme.color.primary : "transparent"};
@@ -163,7 +138,6 @@ export const SortToggleButton = styled.button`
   padding: 2px ${theme.space.sm};
   font-size: ${theme.fontSize.xs};
   cursor: pointer;
-
   &:hover {
     color: ${theme.color.headerText};
     border-color: ${theme.color.accent};

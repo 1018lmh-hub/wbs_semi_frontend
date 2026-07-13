@@ -1,4 +1,3 @@
-// src/features/user/MyPageWithdraw.jsx
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAccountWithdrawal } from "./useAccountWithdrawal";
@@ -15,22 +14,16 @@ import {
   FieldErrorText,
   SubmitButton,
 } from "./MyPageWithdraw.style";
-
-// 백엔드 DeleteUserRequestDto와 동일한 규칙
 const PWD_REGEX = /^[a-zA-Z0-9@$!%*#?&]{8,20}$/;
-
 const MyPageWithdraw = () => {
   const navigate = useNavigate();
   const { requestWithdrawal } = useAccountWithdrawal();
-
   const [userPwd, setUserPwd] = useState("");
   const [fieldError, setFieldError] = useState(null);
-
   const handleChange = (e) => {
     setUserPwd(e.target.value);
     setFieldError(null);
   };
-
   const validate = () => {
     if (!PWD_REGEX.test(userPwd)) {
       setFieldError(
@@ -40,19 +33,14 @@ const MyPageWithdraw = () => {
     }
     return true;
   };
-
   const handleSubmit = (e) => {
     e.preventDefault();
     if (!validate()) return;
-
-    // 실제 비밀번호 검증/탈퇴 확정은 8초 뒤에 이루어짐 (실패 시 토스트로 안내)
     requestWithdrawal(userPwd);
   };
-
   const handleClose = () => {
     navigate("/myPage");
   };
-
   return (
     <WithdrawContainer>
       <HeaderRow>
@@ -60,14 +48,11 @@ const MyPageWithdraw = () => {
           ✕
         </CloseButton>
       </HeaderRow>
-
       <Title>회원탈퇴</Title>
-
       <WarningBox>
         탈퇴 시 계정 정보가 더 이상 사용되지 않습니다. 제출 후 8초 이내에
         토스트의 "작업취소"를 누르면 탈퇴를 취소할 수 있습니다.
       </WarningBox>
-
       <Form onSubmit={handleSubmit} noValidate>
         <FieldGroup>
           <Label htmlFor="userPwd">비밀번호</Label>
@@ -82,11 +67,9 @@ const MyPageWithdraw = () => {
           />
           {fieldError && <FieldErrorText>{fieldError}</FieldErrorText>}
         </FieldGroup>
-
         <SubmitButton type="submit">탈퇴하기</SubmitButton>
       </Form>
     </WithdrawContainer>
   );
 };
-
 export default MyPageWithdraw;

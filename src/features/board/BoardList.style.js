@@ -1,28 +1,23 @@
-// src/features/board/BoardList.style.js
 import styled from "styled-components";
 import { theme } from "../../styles/theme";
-
 export const ListContainer = styled.div`
   display: flex;
   flex-direction: column;
-  flex: 1; /* BoardTabRow를 제외한 남은 공간을 모두 채움 */
+  flex: 1;
   gap: ${theme.space.md};
   padding: ${theme.space.lg};
 `;
-
 export const TitleRow = styled.div`
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: ${theme.space.sm};
 `;
-
 export const PageTitle = styled.h2`
   font-size: ${theme.fontSize.lg};
   color: ${theme.color.text};
   margin: 0;
 `;
-
 export const WriteButton = styled.button`
   flex-shrink: 0;
   background-color: ${theme.color.primary};
@@ -33,12 +28,10 @@ export const WriteButton = styled.button`
   font-size: ${theme.fontSize.xs};
   cursor: pointer;
   white-space: nowrap;
-
   &:hover {
     background-color: ${theme.color.primarySoft};
   }
 `;
-
 export const BoardListWrap = styled.ul`
   list-style: none;
   margin: 0;
@@ -47,37 +40,32 @@ export const BoardListWrap = styled.ul`
   flex-direction: column;
   gap: ${theme.space.sm};
 `;
-
 export const EmptyMessage = styled.p`
   color: ${theme.color.sub};
   font-size: ${theme.fontSize.sm};
   text-align: center;
   padding: ${theme.space.lg} 0;
 `;
-
 export const LoadingMessage = styled.p`
   color: ${theme.color.sub};
   font-size: ${theme.fontSize.sm};
   text-align: center;
   padding: ${theme.space.lg} 0;
 `;
-
 export const ErrorMessage = styled.p`
   color: ${theme.color.danger};
   font-size: ${theme.fontSize.sm};
   text-align: center;
   padding: ${theme.space.lg} 0;
 `;
-
 export const PaginationWrap = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
   gap: ${theme.space.xs};
-  margin-top: auto; /* 남은 공간을 모두 밀어내 항상 바닥에 붙도록 함 */
+  margin-top: auto;
   padding-top: ${theme.space.sm};
 `;
-
 export const PageArrowButton = styled.button`
   background: none;
   border: 1px solid ${theme.color.border};
@@ -86,13 +74,11 @@ export const PageArrowButton = styled.button`
   width: 28px;
   height: 28px;
   cursor: pointer;
-
   &:disabled {
     color: ${theme.color.border};
     cursor: not-allowed;
   }
 `;
-
 export const PageNumberButton = styled.button`
   background-color: ${({ $isActive }) =>
     $isActive ? theme.color.primary : "transparent"};
@@ -104,7 +90,6 @@ export const PageNumberButton = styled.button`
   height: 28px;
   font-size: ${theme.fontSize.xs};
   cursor: pointer;
-
   &:hover {
     background-color: ${({ $isActive }) =>
       $isActive ? theme.color.primary : theme.color.bgSoft};

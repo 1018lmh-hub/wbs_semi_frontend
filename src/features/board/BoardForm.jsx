@@ -23,20 +23,16 @@ import {
   FieldErrorText,
   SubmitButton,
 } from "./BoardForm.style";
-
 const TITLE_MAX = 100;
 const CONTENT_MAX = 2000;
-
 const INITIAL_FORM = {
   title: "",
   content: "",
 };
-
 const ROUTE_CONFIG = {
   notice: { paramName: "noticeNo", listPath: "/notices" },
   inquiry: { paramName: "inquiryNo", listPath: "/inquirys" },
 };
-
 const mapServerFieldErrors = (data, boardType) => {
   if (!data) return {};
   if (boardType === "notice") {
@@ -44,22 +40,17 @@ const mapServerFieldErrors = (data, boardType) => {
   }
   return { title: data.inquiryTitle, content: data.inquiryContent };
 };
-
 const BoardForm = ({ boardType }) => {
   const routeConfig = ROUTE_CONFIG[boardType];
   const params = useParams();
   const boardNo = params[routeConfig.paramName];
-
   const navigate = useNavigate();
   const location = useLocation();
   const { onCloseOverlay } = useOutletContext() ?? {};
   const { isLoggedIn, user } = useAuth();
   const { showToast } = useToast();
-
   const isEditMode = !!boardNo;
-
   const editData = location.state;
-
   const [form, setForm] = useState(() => {
     if (isEditMode && editData) {
       return {
@@ -72,38 +63,30 @@ const BoardForm = ({ boardType }) => {
   const [fieldErrors, setFieldErrors] = useState({});
   const [serverError, setServerError] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
-
   const isAdmin = !!user?.role?.includes("ROLE_ADMIN");
   const isOwner = !!user && isEditMode && editData?.userId === user.userId;
-
   const isWriteUnauthorized =
     !isEditMode && (!isLoggedIn || (boardType === "notice" && !isAdmin));
-
   const isEditUnauthorized = isEditMode && !!editData && !isOwner;
-
   const isUnauthorized = isWriteUnauthorized || isEditUnauthorized;
-
   useEffect(() => {
     if (isUnauthorized) {
       showToast("권한이 없는 접근입니다.", "error");
       navigate("/", { replace: true });
     }
   }, [isUnauthorized]);
-
   useEffect(() => {
     if (isEditMode && !editData) {
       showToast("잘못된 접근입니다. 목록에서 다시 시도해주세요.", "error");
       navigate(routeConfig.listPath, { replace: true });
     }
   }, []);
-
   const handleChange = (e) => {
     const { name, value } = e.target;
     setForm((prev) => ({ ...prev, [name]: value }));
     setFieldErrors((prev) => ({ ...prev, [name]: null }));
     setServerError(null);
   };
-
   const handleClose = () => {
     if (window.history.length > 1) {
       navigate(-1);
@@ -113,36 +96,28 @@ const BoardForm = ({ boardType }) => {
       navigate(routeConfig.listPath);
     }
   };
-
   const handleContentKeyDown = (e) => {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
       e.currentTarget.form?.requestSubmit();
     }
   };
-
   const validate = () => {
     const errors = {};
-
     if (form.title.trim().length < 1 || form.title.length > TITLE_MAX) {
       errors.title = `제목은 1~${TITLE_MAX}자 까지 입력가능합니다.`;
     }
     if (form.content.trim().length < 1 || form.content.length > CONTENT_MAX) {
       errors.content = `내용은 1~${CONTENT_MAX}자 까지 입력가능합니다.`;
     }
-
     setFieldErrors(errors);
     return Object.keys(errors).length === 0;
   };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     setServerError(null);
-
     if (!validate()) return;
-
     setIsSubmitting(true);
-
     try {
       if (isEditMode) {
         await updateBoard(boardType, boardNo, form);
@@ -151,7 +126,6 @@ const BoardForm = ({ boardType }) => {
         await createBoard(boardType, form);
         showToast("게시글이 등록되었습니다.", "success");
       }
-
       if (window.history.length > 1) {
         navigate(-1);
       } else {
@@ -159,7 +133,6 @@ const BoardForm = ({ boardType }) => {
       }
     } catch (err) {
       const responseData = err.response?.data;
-
       if (responseData?.code === 400 && responseData?.data) {
         setFieldErrors(mapServerFieldErrors(responseData.data, boardType));
       } else {
@@ -174,11 +147,8 @@ const BoardForm = ({ boardType }) => {
       setIsSubmitting(false);
     }
   };
-
   if (isUnauthorized) return null;
-
   if (isEditMode && !editData) return null;
-
   return (
     <FormContainer>
       <HeaderRow>
@@ -186,11 +156,8 @@ const BoardForm = ({ boardType }) => {
           ✕
         </CloseButton>
       </HeaderRow>
-
       <Title>{isEditMode ? "게시글 수정하기" : "게시글 작성하기"}</Title>
-
       {serverError && <ServerErrorBox>{serverError}</ServerErrorBox>}
-
       <Form onSubmit={handleSubmit} noValidate>
         <FieldGroup>
           <Label htmlFor="title">제목</Label>
@@ -207,7 +174,6 @@ const BoardForm = ({ boardType }) => {
             <FieldErrorText>{fieldErrors.title}</FieldErrorText>
           )}
         </FieldGroup>
-
         <FieldGroup>
           <Label htmlFor="content">내용</Label>
           <Textarea
@@ -227,7 +193,6 @@ const BoardForm = ({ boardType }) => {
             <FieldErrorText>{fieldErrors.content}</FieldErrorText>
           )}
         </FieldGroup>
-
         <SubmitButton type="submit" disabled={isSubmitting}>
           {isSubmitting
             ? isEditMode
@@ -241,5 +206,4 @@ const BoardForm = ({ boardType }) => {
     </FormContainer>
   );
 };
-
 export default BoardForm;

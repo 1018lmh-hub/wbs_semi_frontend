@@ -25,7 +25,6 @@ import {
   LoadingMessage,
   ErrorMessage,
 } from "./BoardDetail.style";
-
 const ROUTE_CONFIG = {
   notice: { paramName: "noticeNo", listPath: "/notices", editPath: "/notices" },
   inquiry: {
@@ -34,33 +33,25 @@ const ROUTE_CONFIG = {
     editPath: "/inquirys",
   },
 };
-
 const formatDate = (isoString) => (isoString ? isoString.slice(0, 10) : "");
-
 const UNDO_DURATION = 8000;
-
 const BoardDetail = ({ boardType }) => {
   const routeConfig = ROUTE_CONFIG[boardType];
   const params = useParams();
   const boardNo = params[routeConfig.paramName];
-
   const navigate = useNavigate();
   const { onCloseOverlay } = useOutletContext() ?? {};
   const { isLoggedIn, user } = useAuth();
   const { showToast } = useToast();
-
   const [detail, setDetail] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
   const deleteTimerRef = useRef(null);
-
   useEffect(() => {
     if (!boardNo) return;
-
     let cancelled = false;
     setIsLoading(true);
     setError(null);
-
     fetchBoardDetail(boardType, boardNo)
       .then((data) => {
         if (cancelled) return;
@@ -74,12 +65,10 @@ const BoardDetail = ({ boardType }) => {
       .finally(() => {
         if (!cancelled) setIsLoading(false);
       });
-
     return () => {
       cancelled = true;
     };
   }, [boardType, boardNo]);
-
   const handleBack = () => {
     if (window.history.length > 1) {
       navigate(-1);
@@ -87,7 +76,6 @@ const BoardDetail = ({ boardType }) => {
       navigate(routeConfig.listPath);
     }
   };
-
   const handleClose = () => {
     if (onCloseOverlay) {
       onCloseOverlay();
@@ -95,11 +83,9 @@ const BoardDetail = ({ boardType }) => {
       navigate(routeConfig.listPath);
     }
   };
-
   const handleEditClick = () => {
     navigate(`${routeConfig.editPath}/${boardNo}/edit`, { state: detail });
   };
-
   const handleDeleteClick = () => {
     markPendingDeletion(boardType, boardNo);
     showToast("게시글이 삭제되었습니다.", "error", {
@@ -110,7 +96,6 @@ const BoardDetail = ({ boardType }) => {
         unmarkPendingDeletion(boardType, boardNo);
       },
     });
-
     deleteTimerRef.current = setTimeout(async () => {
       try {
         await deleteBoard(boardType, boardNo);
@@ -122,18 +107,14 @@ const BoardDetail = ({ boardType }) => {
         unmarkPendingDeletion(boardType, boardNo);
       }
     }, UNDO_DURATION);
-
     handleBack();
   };
-
   const isAdmin = !!user?.role?.includes("ROLE_ADMIN");
   const isOwner = !!user && detail?.userId === user.userId;
-
   const canManage =
     boardType === "notice"
       ? isLoggedIn && isAdmin && isOwner
       : isLoggedIn && isOwner;
-
   if (isLoading) {
     return (
       <DetailContainer>
@@ -141,7 +122,6 @@ const BoardDetail = ({ boardType }) => {
       </DetailContainer>
     );
   }
-
   if (error || !detail) {
     return (
       <DetailContainer>
@@ -157,7 +137,6 @@ const BoardDetail = ({ boardType }) => {
       </DetailContainer>
     );
   }
-
   return (
     <DetailContainer>
       <HeaderRow>
@@ -165,19 +144,15 @@ const BoardDetail = ({ boardType }) => {
           ← 뒤로
         </BackButton>
       </HeaderRow>
-
       <TitleRow>
         <TitleText>{detail.title}</TitleText>
       </TitleRow>
-
       <Meta>
         <Nickname>{detail.nickname}</Nickname>
         <DateText>{formatDate(detail.createDate)}</DateText>
         <CountText>조회 {detail.count}</CountText>
       </Meta>
-
       <ContentText>{detail.content}</ContentText>
-
       {canManage && (
         <BottomRow>
           <EditButton type="button" onClick={handleEditClick}>
@@ -188,10 +163,8 @@ const BoardDetail = ({ boardType }) => {
           </DeleteButton>
         </BottomRow>
       )}
-
       {boardType === "inquiry" && <CommentList inquiryNo={boardNo} />}
     </DetailContainer>
   );
 };
-
 export default BoardDetail;
