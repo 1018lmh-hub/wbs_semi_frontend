@@ -7,10 +7,13 @@ import clusterIcon4 from "../../assets/cluster4.png";
 import clusterIcon5 from "../../assets/cluster5.png";
 import { makeMarkerClustering } from "../../lib/MarkerClustering";
 import { fetchChargingStations } from "../../lib/stationApi";
+
 const SCRIPT_ID = "naver-map-script";
 const CALLBACK_NAME = "initNaverMap";
 const DEFAULT_CENTER = { lat: 37.5666102, lng: 126.9783881 };
+
 let scriptPromise = null;
+
 function loadNaverMapScript(clientId) {
   if (scriptPromise) return scriptPromise;
   scriptPromise = new Promise((resolve) => {
@@ -33,6 +36,7 @@ function loadNaverMapScript(clientId) {
   });
   return scriptPromise;
 }
+
 function createMarkers(
   stations,
   mapInstance,
@@ -64,6 +68,7 @@ function createMarkers(
     return marker;
   });
 }
+
 function makeImageClusterIcon(url, size) {
   return {
     url,
@@ -73,6 +78,7 @@ function makeImageClusterIcon(url, size) {
     anchor: new window.naver.maps.Point(size / 2, size / 2),
   };
 }
+
 function initCluster(mapInstance, markers) {
   const MarkerClustering = makeMarkerClustering(window.naver);
   const ICON_SIZE = 88;
@@ -93,6 +99,7 @@ function initCluster(mapInstance, markers) {
     indexGenerator: [3, 4, 5],
   });
 }
+
 const Map = ({ onStationSelect, onLocationsLoaded }) => {
   const mapRef = useRef(null);
   const mapInstanceRef = useRef(null);
@@ -100,13 +107,16 @@ const Map = ({ onStationSelect, onLocationsLoaded }) => {
   const clusterRef = useRef(null);
   const infoWindowRef = useRef(null);
   const onStationSelectRef = useRef(onStationSelect);
+
   useEffect(() => {
     onStationSelectRef.current = onStationSelect;
   }, [onStationSelect]);
+
   const [isMapLoaded, setIsMapLoaded] = useState(false);
   const [locations, setLocations] = useState([]);
   const [isLoadingStations, setIsLoadingStations] = useState(false);
   const [stationsError, setStationsError] = useState(null);
+
   useEffect(() => {
     const clientId = import.meta.env.VITE_NAVER_MAP_CLIENT_ID;
     const styleId = import.meta.env.VITE_NAVER_MAP_STYLE_ID;
@@ -157,11 +167,12 @@ const Map = ({ onStationSelect, onLocationsLoaded }) => {
       }
     };
   }, []);
+
   useEffect(() => {
     let cancelled = false;
     setIsLoadingStations(true);
     setStationsError(null);
-    fetchChargingStations("/charging-stations")
+    fetchChargingStations()
       .then((stations) => {
         if (cancelled) return;
         setLocations(stations);
@@ -179,6 +190,7 @@ const Map = ({ onStationSelect, onLocationsLoaded }) => {
       cancelled = true;
     };
   }, []);
+
   useEffect(() => {
     if (!isMapLoaded || !mapInstanceRef.current) return;
     if (locations.length === 0) return;
@@ -199,6 +211,7 @@ const Map = ({ onStationSelect, onLocationsLoaded }) => {
       cleanupMarkers();
     };
   }, [isMapLoaded, locations]);
+
   function cleanupMarkers() {
     markersRef.current.forEach((marker) => {
       window.naver.maps.Event.clearInstanceListeners(marker);
@@ -206,12 +219,14 @@ const Map = ({ onStationSelect, onLocationsLoaded }) => {
     });
     markersRef.current = [];
   }
+
   function cleanupCluster() {
     if (clusterRef.current) {
       clusterRef.current.setMap(null);
       clusterRef.current = null;
     }
   }
+
   return (
     <>
       <MapContainer ref={mapRef} id="map-container" />
@@ -233,4 +248,5 @@ const Map = ({ onStationSelect, onLocationsLoaded }) => {
     </>
   );
 };
+
 export default Map;
