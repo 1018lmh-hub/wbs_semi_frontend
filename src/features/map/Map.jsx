@@ -161,7 +161,7 @@ const Map = ({ onStationSelect, onLocationsLoaded }) => {
     let cancelled = false;
     setIsLoadingStations(true);
     setStationsError(null);
-    fetchChargingStations("/charging-stations")
+    fetchChargingStations()
       .then((stations) => {
         if (cancelled) return;
         setLocations(stations);

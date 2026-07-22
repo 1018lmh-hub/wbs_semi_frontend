@@ -42,8 +42,8 @@ function groupRowsByStation(rows) {
   });
   return Array.from(stationMap.values());
 }
-export async function fetchChargingStations(endpoint = "/charging-stations") {
-  const { data: responseBody } = await api.get("http://localhost/api/stations");
+export async function fetchChargingStations(endpoint = "/stations") {
+  const { data: responseBody } = await api.get(endpoint);
   const rows = parseStationResponse(responseBody);
   return groupRowsByStation(rows);
 }
