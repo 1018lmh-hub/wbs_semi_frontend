@@ -1,5 +1,6 @@
 import api from "../api/axios";
 import { getChargeStatusLabel, getChargeModeLabel } from "./chargeStatus";
+
 function parseStationResponse(responseBody) {
   if (!responseBody || typeof responseBody.data !== "string") {
     console.warn("예상치 못한 응답 형식입니다:", responseBody);
@@ -14,6 +15,7 @@ function parseStationResponse(responseBody) {
   }
   return Array.isArray(inner?.data) ? inner.data : [];
 }
+
 function groupRowsByStation(rows) {
   const stationMap = new Map();
   rows.forEach((row) => {
@@ -47,6 +49,7 @@ export async function fetchChargingStations(endpoint = "/stations") {
   const rows = parseStationResponse(responseBody);
   return groupRowsByStation(rows);
 }
+
 export const fetchStationReviews = async (stationNo) => {
   try {
     const res = await api.get(`/stations/${stationNo}`, {
@@ -60,6 +63,7 @@ export const fetchStationReviews = async (stationNo) => {
     throw err;
   }
 };
+
 export const createStationReview = async (
   stationNo,
   { title, content, rating },
@@ -71,6 +75,7 @@ export const createStationReview = async (
   });
   return res.data;
 };
+
 export const fetchStationReviewList = async (stationNo, page = 1) => {
   try {
     const res = await api.get(`/stations/${stationNo}/reviews`, {
@@ -81,6 +86,7 @@ export const fetchStationReviewList = async (stationNo, page = 1) => {
     throw err;
   }
 };
+
 export const updateStationReview = async (
   stationNo,
   reviewNo,
@@ -93,34 +99,41 @@ export const updateStationReview = async (
   });
   return res.data;
 };
+
 export const deleteStationReview = async (stationNo, reviewNo) => {
   const res = await api.delete(`/stations/${stationNo}/reviews/${reviewNo}`);
   return res.data;
 };
+
 export const addReviewLike = async (stationNo, reviewNo) => {
   const res = await api.post(
     `/stations/${stationNo}/reviews/${reviewNo}/likes`,
   );
   return res.data;
 };
+
 export const deleteReviewLike = async (stationNo, reviewNo) => {
   const res = await api.delete(
     `/stations/${stationNo}/reviews/${reviewNo}/likes`,
   );
   return res.data;
 };
+
 export const addBookmark = async (stationNo) => {
   const res = await api.post(`/stations/${stationNo}/bookmarks`);
   return res.data;
 };
+
 export const deleteBookmark = async (stationNo) => {
   const res = await api.delete(`/stations/${stationNo}/bookmarks`);
   return res.data;
 };
+
 export const fetchBookmarks = async () => {
   const res = await api.get("/stations/bookmarks");
   return res.data.data;
 };
+
 export const fetchStationReviewListLatest = async (stationNo, page = 1) => {
   try {
     const res = await api.get(`/stations/${stationNo}/reviews/latest`, {
