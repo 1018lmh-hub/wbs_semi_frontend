@@ -44,7 +44,6 @@ function groupRowsByStation(rows) {
   });
   return Array.from(stationMap.values());
 }
-
 export async function fetchChargingStations(endpoint = "/stations") {
   const { data: responseBody } = await api.get(endpoint);
   const rows = parseStationResponse(responseBody);
