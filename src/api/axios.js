@@ -13,12 +13,10 @@ api.interceptors.response.use(
   (res) => res,
   async (err) => {
     const { config: original, response } = err;
-    if (response.status !== 401) {
+    if (!response || response.status !== 401) {
       return Promise.reject(err);
     }
-    const isExpired = String(response.data.message).includes(
-      "만료된 토큰입니다.",
-    );
+    const isExpired = response.data?.errorCode === "TOKEN_EXPIRED";
     if (!isExpired || original._retry) {
       return Promise.reject(err);
     }
