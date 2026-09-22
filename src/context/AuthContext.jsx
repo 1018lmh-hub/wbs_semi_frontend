@@ -35,9 +35,7 @@ export const AuthProvider = ({ children }) => {
     const refreshToken = localStorage.getItem(STORAGE_KEYS.refreshToken);
     if (refreshToken) {
       try {
-        await api.post("/auth/logout", JSON.stringify(refreshToken), {
-          headers: { "Content-Type": "application/json" },
-        });
+        await api.post("/auth/logout", { refreshToken });
       } catch (err) {
         console.error("서버 로그아웃 요청 실패:", err);
       }

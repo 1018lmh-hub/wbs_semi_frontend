@@ -31,6 +31,7 @@ export const fetchBoardList = async (boardType, page = 1) => {
       modifyDate: item.modifyDate,
       status: item.status,
       hasComment: item.hasComment,
+      aiSummary: item.aiSummary,
     }));
     return { items, pageInfo: pageInfo ?? null };
   } catch (err) {

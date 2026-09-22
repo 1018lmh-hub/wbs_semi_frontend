@@ -150,9 +150,10 @@ const BoardDetail = ({ boardType }) => {
       <Meta>
         <Nickname>{detail.nickname}</Nickname>
         <DateText>{formatDate(detail.createDate)}</DateText>
-        <CountText>조회 {detail.count}</CountText>
+        <CountText>조회수 {detail.count}</CountText>
       </Meta>
       <ContentText>{detail.content}</ContentText>
+      <ContentText>{detail.aiSummary}</ContentText>
       {canManage && (
         <BottomRow>
           <EditButton type="button" onClick={handleEditClick}>
